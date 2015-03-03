@@ -1,0 +1,76 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/conversation_horizontal_margin"
+    android:paddingRight="@dimen/conversation_horizontal_margin"
+    android:paddingTop="@dimen/conversation_vertical_margin"
+    android:paddingBottom="@dimen/conversation_vertical_margin"
+    tools:context="com.ioane.sharvadze.geosms.conversation.ConversationActivity"
+    android:orientation="vertical"
+    android:background="#ffffff"
+    >
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/conversation_list_view"
+
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0.5dp"
+        android:stackFromBottom="true"
+        android:background="#ffffffff"
+        android:transcriptMode="normal"
+        />
+
+    <LinearLayout
+        android:focusable="true" android:focusableInTouchMode="true"
+        android:layout_width="0px" android:layout_height="0px"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <ToggleButton
+            android:textSize="10sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/web_toggle_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:textOff=""
+            android:textOn=""
+            android:layout_weight="0.01"
+            android:id="@+id/use_web_toggle_button"/>
+        <EditText
+            android:textColorHint="#ff44cc0a"
+            android:background="#ffffffff"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="13dp"
+            android:hint="@string/edit_text_hint"
+            android:id="@+id/enter_message_edit_text"
+            />
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@mipmap/send"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
+            android:id="@+id/send_button"
+            />
+
+        </LinearLayout>
+
+
+
+</LinearLayout>

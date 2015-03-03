@@ -1,0 +1,36 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/conversations_list_horizontal_margin"
+    android:paddingRight="@dimen/conversations_list_horizontal_margin"
+    android:paddingTop="@dimen/conversations_list_vertical_margin"
+    android:paddingBottom="@dimen/conversations_list_vertical_margin" tools:context=".ChatList"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/not_default_app">
+
+        <Button
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:background="@color/darkgreen"
+            android:text="@string/set_default_app"
+            android:id="@+id/change_default_app"
+            />
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/conversations_list_view"
+
+        android:divider="@android:color/transparent"
+        android:dividerHeight="1dp"
+        />
+
+
+</LinearLayout>

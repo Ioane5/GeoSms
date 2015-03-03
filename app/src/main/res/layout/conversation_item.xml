@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:drawingCacheQuality="low"
+        android:background="@mipmap/no_image"
+        android:id="@+id/contact_picture_image_view"/>
+
+    <View
+        android:layout_width="5dp"
+        android:layout_height="match_parent"></View>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            ></View>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:textAllCaps="true"
+                android:textSize="18sp"
+                android:id="@+id/contact_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                ></View>
+
+            <TextView
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:textColor="#808080"
+                android:id="@+id/last_message_date_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            ></View>
+
+
+        <TextView
+            android:textSize="11sp"
+            android:textColor="#808080"
+            android:textStyle="italic"
+            android:id="@+id/last_message_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
+            />
+
+
+        </LinearLayout>
+
+</LinearLayout>
