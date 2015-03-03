@@ -2,8 +2,11 @@ package com.ioane.sharvadze.geosms.objects;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.Constants.MESSAGE;
 
 import java.util.Date;
@@ -153,6 +156,28 @@ public class SMS {
         values.put(MESSAGE.TYPE, msgTypeToInt(this.getMsgType()));
 
         return values;
+    }
+
+    public static ContentValues getContentValuesFromBundle(Bundle bundle){
+        Object[] pdus = (Object[]) bundle.get("pdus");
+        SmsMessage[] msgs = new SmsMessage[pdus.length];
+        StringBuilder messageText = new StringBuilder();
+        for (int i=0; i<msgs.length; i++){
+            msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+            messageText.append( msgs[i].getMessageBody().toString());
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(Constants.ADDRESS,msgs[0].getOriginatingAddress());
+        cv.put(MESSAGE.BODY,messageText.toString());
+        cv.put(MESSAGE.PROTOCOL,msgs[0].getProtocolIdentifier());
+        cv.put(MESSAGE.TYPE,MESSAGE.MESSAGE_TYPE_INBOX);
+        cv.put(MESSAGE.SUBJECT,msgs[0].getPseudoSubject());
+        cv.put(MESSAGE.SERVICE_CENTER, msgs[0].getServiceCenterAddress());
+        cv.put(MESSAGE.READ, 0); // isn't read
+        cv.put(MESSAGE.DATE,msgs[0].getTimestampMillis());
+        cv.put(MESSAGE.ERROR_CODE, msgs[0].getStatus());
+
+        return cv;
     }
 
 }

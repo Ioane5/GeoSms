@@ -24,6 +24,8 @@ public interface Constants {
 
     interface Actions{
         String MESSAGE_SENT = "sms_sent";
+        String MESSAGE_DELIVERED_1= "android.provider.Telephony.SMS_RECEIVED";
+        String MESSAGE_DELIVERED_2= "android.provider.Telephony.SMS_DELIVER";
     }
 
     interface MESSAGE{
