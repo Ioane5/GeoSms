@@ -10,10 +10,11 @@
     <string name="set_default_app_to_send"><i>To send, set as default SMS app</i></string>
     <string name="sms_default_success"><b>Thanks for making right decision</b></string>
     <string name="sms_default_fail">;((</string>
-
-
-
-
+    <string name="websms_not_found">your websms account not found</string>
+    <string name="websms_unable_login">Unable to login, please check your password</string>
+    <string name="pref_enable_websms">Enable Web SMS</string>
+    <string name="pref_websms_clients">Web Sms Client</string>
+    <string name="summary">password</string>
 
 
 </resources>

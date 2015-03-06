@@ -9,6 +9,8 @@ import android.util.Log;
 import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.Constants.MESSAGE;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -69,6 +71,17 @@ public class SMS {
         this.isRead = isRead;
         this.isDelivered = isDelivered;
         this.serviceCenter = serviceCenter;
+    }
+
+    public SMS(ContentValues cv){
+        this.text = cv.getAsString(MESSAGE.BODY);
+        this.date = new Date(cv.getAsLong(MESSAGE.DATE));
+        this.type = intToMsgType(cv.getAsInteger(MESSAGE.PROTOCOL));
+        this.isRead = cv.getAsInteger(MESSAGE.READ) == 1? true : false;
+        Integer temp = cv.getAsInteger(MESSAGE.STATUS);
+        if(temp == null) this.isDelivered = false;
+        else this.isDelivered = temp == 1? true:false;
+        this.serviceCenter = cv.getAsString(MESSAGE.SERVICE_CENTER);
     }
 
     public SMS(Cursor cursor){
@@ -157,6 +170,7 @@ public class SMS {
 
         return values;
     }
+
 
     public static ContentValues getContentValuesFromBundle(Bundle bundle){
         Object[] pdus = (Object[]) bundle.get("pdus");

@@ -5,6 +5,9 @@ package com.ioane.sharvadze.geosms;
  */
 public interface Constants {
 
+    String MAGTIFUN = "Magtifun";
+    String GEOCELL = "GeoCell";
+
     String RECIPIENT_ID = "recipient_ids";
 
     String CONVERSATION_LAST_MESSAGE = "snippet";

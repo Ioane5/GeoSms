@@ -71,6 +71,41 @@ public class Contact implements Serializable{
         bundle.putParcelable(PHOTO,photo);
         return bundle;
     }
+
+    private void initFromAddress(Context context,String address){
+        setAddress(address);
+        Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(address));
+        Cursor c = context.getContentResolver().query(lookupUri, null, null, null, null);
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+            String displayName = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String photoURI = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+
+            setName(displayName);
+            setPhotoUri(photoURI);
+            setPhoto(getPhotoFromURI(photoURI,context));
+        }
+        c.close();
+    }
+
+    public Contact(Context context,String address){
+        initFromAddress(context,address);
+        //  get id from address...
+        Cursor c = context.getContentResolver().query(
+                Uri.parse("content://mms-sms/canonical-addresses"), new String[]{"_id"},
+                "address" + " = ?",
+                new String[]{address}, null);
+
+        if (c != null) {
+            if (c.getCount() != 0) {
+                c.moveToNext();
+                setId(c.getInt(c.getColumnIndex("_id")));
+            }
+            c.close();
+        }
+    }
+
+
     public Contact(Context context,int recipientId){
         setId(recipientId);
         setAddress(null);
@@ -80,24 +115,11 @@ public class Contact implements Serializable{
         ContentResolver cr = context.getContentResolver();
         Cursor c = cr.query(ContentUris.withAppendedId(Uri.parse("content://mms-sms/canonical-address"), recipientId),
                 null, null, null, null);
-
         if(c.moveToFirst()){
             String address = c.getString(0);
             c.close();
-            if(address != null) {
-                setAddress(address);
-                Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(address));
-                c = context.getContentResolver().query(lookupUri, null, null, null, null);
-                if (c.getCount() > 0) {
-                    c.moveToFirst();
-                    String displayName = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    String photoURI = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                    setName(displayName);
-                    setPhotoUri(photoURI);
-                    setPhoto(getPhotoFromURI(photoURI,context));
-                }
-                c.close();
-            }
+            if(address != null)
+                initFromAddress(context,address);
         }else
             c.close();
 
@@ -106,20 +128,11 @@ public class Contact implements Serializable{
     private Bitmap getPhotoFromURI(String photoURI,Context context) {
         if(photoURI == null) return null;
         try {
-            // get image from filesystem
-            InputStream input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
-
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inSampleSize = 8;
-            // reduce quality
-            Bitmap bitmap = BitmapFactory.decodeStream(input,null,options);
-            // return circled image bitmap
-            return Utils.getCircleBitmap(bitmap);
-        } catch (Exception e) {
-            Log.w(TAG,"exception on decoding contact photo");
+            return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoURI,context,8));
+        }catch (Exception e){
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public int getId() {

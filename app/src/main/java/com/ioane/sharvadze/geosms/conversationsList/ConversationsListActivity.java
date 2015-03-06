@@ -16,13 +16,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.ioane.sharvadze.geosms.MyActivity;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.Utils;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
 
-public class ConversationsListActivity extends ActionBarActivity{
+public class ConversationsListActivity extends MyActivity{
 
     private final String TAG  = ConversationsListActivity.class.getSimpleName();
 
@@ -120,27 +121,5 @@ public class ConversationsListActivity extends ActionBarActivity{
     }
 
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_chat_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 }

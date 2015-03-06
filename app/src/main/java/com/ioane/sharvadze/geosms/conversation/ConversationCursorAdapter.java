@@ -85,7 +85,9 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
         holder.nameView.setText("me");
         holder.photo.setImageBitmap(MY_IMAGE);
-        holder.deliveryStatusView.setText(null);
+        if (holder.deliveryStatusView.length() > 0) {
+            holder.deliveryStatusView.setText("");
+        }
 
         switch (type){
             case SENT:
@@ -106,7 +108,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
             case RECEIVED:
                 view.setBackgroundColor(Color.parseColor("#1F44CC0A"));
                 holder.nameView.setText(TextUtils.isEmpty(contact.getName())? contact.getAddress():contact.getName());
-                holder.deliveryStatusView.setText(null);
                 holder.photo.setImageBitmap(contact.getPhoto());
                 break;
         }
@@ -115,6 +116,5 @@ public class ConversationCursorAdapter extends CursorAdapter {
         CharSequence formattedTime = DateUtils.getRelativeTimeSpanString(message.getDate().getTime(),
                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
         holder.timeView.setText(formattedTime);
-
     }
 }
