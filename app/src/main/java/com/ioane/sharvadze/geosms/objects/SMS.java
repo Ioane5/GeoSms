@@ -180,6 +180,7 @@ public class SMS {
             msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
             messageText.append( msgs[i].getMessageBody().toString());
         }
+        msgs[0].getUserData();
         ContentValues cv = new ContentValues();
         cv.put(Constants.ADDRESS,msgs[0].getOriginatingAddress());
         cv.put(MESSAGE.BODY,messageText.toString());

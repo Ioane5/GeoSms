@@ -5,15 +5,12 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.ioane.sharvadze.geosms.Utils;
 
-import java.io.InputStream;
 import java.io.Serializable;
 
 /**
@@ -22,6 +19,8 @@ import java.io.Serializable;
 public class Contact implements Serializable{
 
     private int id;
+
+    private int threadId;
 
     private String name;
 
@@ -34,8 +33,8 @@ public class Contact implements Serializable{
 
     private static final String TAG = Contact.class.getSimpleName();
 
-    public Contact(int id, String name, String photoUri,String address,Bitmap photo) {
-        this.id = id;
+    public Contact(int threadId, String name, String photoUri,String address,Bitmap photo) {
+        this.threadId = threadId;
         this.name = name;
         this.photoUri = photoUri;
         this.address = address;
@@ -55,7 +54,7 @@ public class Contact implements Serializable{
     private static final String ADDRESS = "address";
 
     public Contact(Bundle contactData){
-        this.id = contactData.getInt(ID);
+        this.threadId = contactData.getInt(ID);
         this.name = contactData.getString(NAME);
         this.photoUri =  contactData.getString(PHOTO_URI);
         this.address = contactData.getString(ADDRESS);
@@ -64,7 +63,7 @@ public class Contact implements Serializable{
 
     public Bundle getBundle(){
         Bundle bundle = new Bundle();
-        bundle.putInt(ID,id);
+        bundle.putInt(ID,threadId);
         bundle.putString(NAME,name);
         bundle.putString(PHOTO_URI,photoUri);
         bundle.putString(ADDRESS,address);
@@ -80,7 +79,9 @@ public class Contact implements Serializable{
             c.moveToFirst();
             String displayName = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String photoURI = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            int id = c.getInt(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
 
+            setId(id);
             setName(displayName);
             setPhotoUri(photoURI);
             setPhoto(getPhotoFromURI(photoURI,context));
@@ -99,7 +100,7 @@ public class Contact implements Serializable{
         if (c != null) {
             if (c.getCount() != 0) {
                 c.moveToNext();
-                setId(c.getInt(c.getColumnIndex("_id")));
+                setThreadId(c.getInt(c.getColumnIndex("_id")));
             }
             c.close();
         }
@@ -107,7 +108,7 @@ public class Contact implements Serializable{
 
 
     public Contact(Context context,int recipientId){
-        setId(recipientId);
+        setThreadId(recipientId);
         setAddress(null);
         setName(null);
         setPhotoUri(null);
@@ -141,6 +142,14 @@ public class Contact implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(int id) {
+        this.threadId = id;
     }
 
     public String getName() {
@@ -178,7 +187,7 @@ public class Contact implements Serializable{
     @Override
     public String toString() {
         return "Contact{" +
-                "id=" + id +
+                "threadId=" + threadId +
                 ", name='" + name + '\'' +
                 ", photoUri='" + photoUri + '\'' +
                 ", address='" + address + '\'' +

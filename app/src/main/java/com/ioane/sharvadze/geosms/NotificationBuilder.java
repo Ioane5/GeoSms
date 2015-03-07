@@ -2,6 +2,8 @@ package com.ioane.sharvadze.geosms;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.content.Context;
@@ -18,9 +20,15 @@ public class NotificationBuilder {
 
     static Notification buildSmsReceiveNotification(Context ctx,Contact contact,SMS sms){
 
+        Bitmap photo;
+        if(contact.getPhotoUri() == null){
+            photo =  BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.no_image);
+        }else {
+            photo = Utils.getPhotoFromURI(contact.getPhotoUri(),ctx,4);
+        }
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
-                        .setLargeIcon(Utils.getPhotoFromURI(contact.getPhotoUri(),ctx,4))
+                        .setLargeIcon(photo)
                         .setSmallIcon(R.mipmap.geosms_icon)
                         .setContentTitle(contact.getName() == null? contact.getAddress():contact.getName())
                         .setContentText(sms.getText())

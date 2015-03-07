@@ -2,9 +2,13 @@ package com.ioane.sharvadze.geosms.conversationsList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 
 import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
@@ -18,6 +22,8 @@ public class ConversationItemClickListener implements  AdapterView.OnItemClickLi
 
     private ArrayAdapter<Conversation> adapter;
     private Context context;
+
+    private static final String TAG = ConversationItemClickListener.class.getSimpleName();
 
     public ConversationItemClickListener(ArrayAdapter<Conversation> adapter, Context context){
         this.adapter = adapter;
@@ -34,4 +40,5 @@ public class ConversationItemClickListener implements  AdapterView.OnItemClickLi
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
     }
+
 }

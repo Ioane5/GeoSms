@@ -1,5 +1,6 @@
 package com.ioane.sharvadze.geosms.websms;
 
+import android.content.Context;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.preference.PreferenceManager;
@@ -7,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ioane.sharvadze.geosms.Constants;
+import com.ioane.sharvadze.geosms.MyPreferencesManager;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -46,11 +48,13 @@ public class MagtifunWebSms extends AbstractWebSms {
         SEND_URL = "/scripts/sms_send.php";
 
     }
+    private Context ctx;
 
-    public MagtifunWebSms(String userName, String password,String cookie) {
+    public MagtifunWebSms(String userName, String password,String cookie,Context ctx) {
         super(userName, password);
         this.cookie = cookie;
         accountName = Constants.MAGTIFUN;
+        this.ctx = ctx;
     }
 
     /**
@@ -124,6 +128,8 @@ public class MagtifunWebSms extends AbstractWebSms {
                     String token = tokenizer.nextToken();
                     if(token.length() > 6) {
                         this.cookie = token;
+                        MyPreferencesManager.saveCookie(
+                                PreferenceManager.getDefaultSharedPreferences(ctx.getApplicationContext()),this.cookie);
                         return;
                     }
                 }
@@ -162,8 +168,10 @@ public class MagtifunWebSms extends AbstractWebSms {
                 Log.i(TAG,responseString);
 
                 out.close();
-                return true;
-                //..more logic
+                if(!TextUtils.isEmpty(responseString) && responseString.equals("success"))
+                    return true;
+                else
+                    return false;
             } else{
                 //Closes the connection.
                 response.getEntity().getContent().close();

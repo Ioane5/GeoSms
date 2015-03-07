@@ -74,6 +74,7 @@
         <activity
             android:name=".conversation.ConversationActivity"
             android:label="@string/title_activity_conversation"
+            android:parentActivityName=".conversationsList.ConversationsListActivity"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

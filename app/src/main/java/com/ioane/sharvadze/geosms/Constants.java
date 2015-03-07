@@ -16,6 +16,8 @@ public interface Constants {
 
     String CONVERSATION_READ = "read";
 
+    String DRAFTS_FILE = "drafts";
+
     /**
      * For intent
      */

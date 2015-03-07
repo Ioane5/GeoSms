@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +52,6 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
         ViewHolder holder;
 
         if (view == null) {
-            Log.i(TAG,"creating list item");
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.conversation_item, null);
 
@@ -75,6 +73,8 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
         holder.messageView.setText("");
 
         Contact contact = conversation.getContact();
+        holder.contactImageView.setTag(contact);
+
         if(contact != null){
             if(contact.getName() != null && !contact.getName().equals("")){
                 holder.contactNameView.setText(contact.getName());

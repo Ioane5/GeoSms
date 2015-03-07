@@ -9,7 +9,8 @@
         android:layout_margin="10dp"
         android:drawingCacheQuality="low"
         android:background="@mipmap/no_image"
-        android:id="@+id/contact_picture_image_view"/>
+        android:id="@+id/contact_picture_image_view"
+        android:onClick="onContactImageClick"/>
 
     <View
         android:layout_width="5dp"

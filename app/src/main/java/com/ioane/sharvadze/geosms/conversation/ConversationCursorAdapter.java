@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +63,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return LayoutInflater.from(context).inflate(R.layout.message_item,parent,false);
     }
+
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {

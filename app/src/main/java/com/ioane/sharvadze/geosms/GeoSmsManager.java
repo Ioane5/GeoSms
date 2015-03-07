@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
         this.context = context;
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        this.webSmsManager = MyPreferencesManager.getWebSmsManager(prefs);
+        this.webSmsManager = MyPreferencesManager.getWebSmsManager(prefs,context);
         prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -135,33 +136,12 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        this.webSmsManager = MyPreferencesManager.getWebSmsManager(sharedPreferences);
-    }
-
-    private class SentBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(TAG,"onReceive()");
-            switch (getResultCode()){
-                case Activity.RESULT_OK:
-                    Log.d(TAG, "SMS sent");
-                    break;
-                case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    Log.d(TAG, "Generic failure");
-                    break;
-                case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    Log.d(TAG,"No service");
-                    break;
-                case SmsManager.RESULT_ERROR_NULL_PDU:
-                    Log.d(TAG, "Null PDU");
-                    break;
-                case SmsManager.RESULT_ERROR_RADIO_OFF:
-                    Log.d(TAG, "Radio off");
-                    break;
-                default:
-                    Log.d(TAG,"result Code :" + getResultCode());
-            }
+        if(MyPreferencesManager.WEBSMS_NAME.equals(key)){
+            this.webSmsManager = MyPreferencesManager.getWebSmsManager(sharedPreferences,context);
+        }else if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
+            this.webSmsManager.setUserName(sharedPreferences.getString(MyPreferencesManager.WEBSMS_USERNAME,""));
+        }if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
+            this.webSmsManager.setPassword(sharedPreferences.getString(MyPreferencesManager.WEBSMS_PASSWORD,""));
         }
     }
 

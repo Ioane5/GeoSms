@@ -4,9 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +23,7 @@ import android.widget.Toast;
 import com.ioane.sharvadze.geosms.MyActivity;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.Utils;
+import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
@@ -64,6 +69,33 @@ public class ConversationsListActivity extends MyActivity{
         defaultAppResolve();
         // Listen to clicks
         conversationList.setOnItemClickListener(new ConversationItemClickListener(listAdapter, getBaseContext()));
+    }
+
+
+
+    public void onContactImageClick(View v){
+        Log.i(TAG,"contact clicked " + v.getClass().getSimpleName());
+
+        Contact contact = (Contact)v.getTag();
+        if(contact == null){
+            Log.i(TAG,"contact null");
+            return;
+        }else {
+            Intent intent = null;
+            if(TextUtils.isEmpty(contact.getName())){
+                intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT,ContactsContract.Contacts.CONTENT_URI);
+                intent.setData(Uri.fromParts("tel", contact.getAddress(), null));
+                intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.getName());
+                intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getAddress());
+                intent.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE,
+                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+            }else {
+                Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
+                intent = new Intent(Intent.ACTION_VIEW, uri);
+            }
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            startActivity(intent);
+        }
     }
 
     private void defaultAppResolve(){

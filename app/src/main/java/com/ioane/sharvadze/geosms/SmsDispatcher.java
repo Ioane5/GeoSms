@@ -1,7 +1,6 @@
 package com.ioane.sharvadze.geosms;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -10,13 +9,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
-
-import java.util.Objects;
 
 /**
  * Created by Ioane on 3/1/2015.
@@ -65,8 +61,9 @@ public class SmsDispatcher extends BroadcastReceiver {
                 NotificationManager mNotificationManager =
                         (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
                 // mId allows you to update the notification later on.
-                int mId = 1;
-                mNotificationManager.notify(mId, NotificationBuilder.buildSmsReceiveNotification(ctx,contact,sms));
+                if(!sms.isRead()){
+                    mNotificationManager.notify(contact.getThreadId(), NotificationBuilder.buildSmsReceiveNotification(ctx,contact,sms));
+                }
                 return null;
             }
         }.execute(ctx,intent.getExtras());
