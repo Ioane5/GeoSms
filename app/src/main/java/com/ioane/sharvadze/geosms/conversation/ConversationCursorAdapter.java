@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +50,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
     }
 
 
-    static class ViewHolder {
+    private class ViewHolder {
         TextView messageView;
         TextView nameView;
         TextView deliveryStatusView;

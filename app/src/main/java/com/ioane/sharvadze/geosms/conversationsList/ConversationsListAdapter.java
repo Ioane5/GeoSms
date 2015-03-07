@@ -28,9 +28,9 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
     private final String TAG = ConversationsListAdapter.class.getSimpleName();
 
 
-    private static Bitmap DEFAULT_IMAGE;
+    //private static Bitmap DEFAULT_IMAGE;
 
-    static class ViewHolder {
+    private class ViewHolder {
         TextView contactNameView;
         TextView messageView;
         TextView messageDateView;
@@ -40,10 +40,10 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
     public ConversationsListAdapter(Context context, int resource, List<Conversation> objects) {
         super(context, resource, objects);
 
-        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.no_image);
-        // make it circle like.
-        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
+//        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
+//                R.mipmap.no_image);
+//        // make it circle like.
+//        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
     }
 
     @Override

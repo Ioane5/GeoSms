@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 
+import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.Utils;
 
 import java.io.Serializable;
@@ -129,7 +130,7 @@ public class Contact implements Serializable{
     private Bitmap getPhotoFromURI(String photoURI,Context context) {
         if(photoURI == null) return null;
         try {
-            return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoURI,context,8));
+            return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoURI,context, Constants.IMAGE_SIZE));
         }catch (Exception e){
             e.printStackTrace();
             return null;

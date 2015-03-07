@@ -2,7 +2,6 @@ package com.ioane.sharvadze.geosms;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -20,8 +18,6 @@ import com.ioane.sharvadze.geosms.objects.SMS;
 import com.ioane.sharvadze.geosms.websms.AbstractWebSms;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by Ioane on 3/1/2015.
@@ -96,11 +92,15 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
                             return R.string.websms_not_found;
                         }
                         if(!webSmsManager.sendSms(sms.getText(),address)){
-                            pi.send(Activity.RESULT_CANCELED);
-                            return R.string.websms_unable_login;
-                        }else {
-                            pi.send(Activity.RESULT_OK);
+                            webSmsManager.authenticate(); // try to auth second time.
+                            if(!webSmsManager.sendSms(sms.getText(),address)){
+                                pi.send(Activity.RESULT_CANCELED);
+                                return R.string.websms_unable_login;
+                            }
                         }
+                        // we sent  successfully
+                        pi.send(Activity.RESULT_OK);
+
 
                     } catch (PendingIntent.CanceledException e) {
                         e.printStackTrace();
@@ -141,7 +141,7 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
         }else if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
             this.webSmsManager.setUserName(sharedPreferences.getString(MyPreferencesManager.WEBSMS_USERNAME,""));
         }if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
-            this.webSmsManager.setPassword(sharedPreferences.getString(MyPreferencesManager.WEBSMS_PASSWORD,""));
+            this.webSmsManager.setPassword(sharedPreferences.getString(MyPreferencesManager.WEBSMS_PASSWORD, ""));
         }
     }
 

@@ -13,8 +13,8 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
-import android.util.Log;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
@@ -29,7 +29,7 @@ public class Utils {
                 .getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
-        final int pixels = 1000;
+        final int pixels = Constants.IMAGE_SIZE;
         final int color = 0xff424242;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
@@ -58,19 +58,28 @@ public class Utils {
     }
 
 
-    public static Bitmap getPhotoFromURI(String photoURI,Context context,int reduceQuality) {
+    public static Bitmap getPhotoFromURI(String photoURI,Context context,int size) {
         if(photoURI == null) return null;
         try {
             // get image from filesystem
             InputStream input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
 
             BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inSampleSize = reduceQuality;
+            options.inJustDecodeBounds = true;
 
-            // reduce quality
-            Bitmap bitmap = BitmapFactory.decodeStream(input,null,options);
-            // return circled image bitmap
-            return bitmap;
+            BitmapFactory.decodeStream(input,null,options);
+
+            //Find the correct scale value. It should be the power of 2.
+            int scale=1;
+            while(options.outWidth/scale/2>=size && options.outHeight/scale/2>=size)
+                scale*=2;
+
+            //now we got how much we must reduce image quality.
+            options = new BitmapFactory.Options();
+            options.inSampleSize=scale;
+
+            input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
+            return BitmapFactory.decodeStream(input, null, options);
         } catch (Exception e) {
             e.printStackTrace();
         }

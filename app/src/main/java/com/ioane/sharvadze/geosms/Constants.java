@@ -5,6 +5,8 @@ package com.ioane.sharvadze.geosms;
  */
 public interface Constants {
 
+    int IMAGE_SIZE = 60;
+
     String MAGTIFUN = "Magtifun";
     String GEOCELL = "GeoCell";
 

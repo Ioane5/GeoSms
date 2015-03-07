@@ -60,6 +60,7 @@ public class SmartConversationFetcher extends AsyncTask<Void, Void, List<Convers
             return; // we already loaded data.
         }
 
+
         // This task finishes loading...
         new AsyncTask<Cursor, Void, List<Conversation>>() {
             @Override

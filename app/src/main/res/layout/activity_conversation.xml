@@ -46,7 +46,7 @@
             android:layout_weight="0.01"
             android:id="@+id/use_web_toggle_button"/>
         <EditText
-            android:textColorHint="#ff44cc0a"
+
             android:background="#ffffffff"
             android:layout_width="0dp"
             android:layout_weight="1"

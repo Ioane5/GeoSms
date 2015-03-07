@@ -7,8 +7,6 @@ import android.util.Log;
 import com.ioane.sharvadze.geosms.websms.AbstractWebSms;
 import com.ioane.sharvadze.geosms.websms.MagtifunWebSms;
 
-import java.util.prefs.PreferenceChangeListener;
-
 /**
  * Created by Ioane on 3/5/2015.
  */

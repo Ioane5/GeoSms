@@ -2,12 +2,12 @@ package com.ioane.sharvadze.geosms;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.content.Context;
-import android.content.Intent;
 
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.objects.Contact;
@@ -18,7 +18,7 @@ import com.ioane.sharvadze.geosms.objects.SMS;
  */
 public class NotificationBuilder {
 
-    static Notification buildSmsReceiveNotification(Context ctx,Contact contact,SMS sms){
+    public static Notification buildSmsReceiveNotification(Context ctx,Contact contact,SMS sms){
 
         Bitmap photo;
         if(contact.getPhotoUri() == null){

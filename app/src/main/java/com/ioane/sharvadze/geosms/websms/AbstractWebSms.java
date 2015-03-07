@@ -1,7 +1,5 @@
 package com.ioane.sharvadze.geosms.websms;
 
-import java.security.Security;
-
 /**
  * Created by Ioane on 3/5/2015.
  */

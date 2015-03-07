@@ -1,34 +1,33 @@
 package com.ioane.sharvadze.geosms.conversationsList;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.MyActivity;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.Utils;
+import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
 
-public class ConversationsListActivity extends MyActivity{
+public class ConversationsListActivity extends MyActivity implements AdapterView.OnItemClickListener{
 
     private final String TAG  = ConversationsListActivity.class.getSimpleName();
 
@@ -68,7 +67,7 @@ public class ConversationsListActivity extends MyActivity{
         conversationList.setAdapter(listAdapter);
         defaultAppResolve();
         // Listen to clicks
-        conversationList.setOnItemClickListener(new ConversationItemClickListener(listAdapter, getBaseContext()));
+        conversationList.setOnItemClickListener(this);
     }
 
 
@@ -97,6 +96,7 @@ public class ConversationsListActivity extends MyActivity{
             startActivity(intent);
         }
     }
+
 
     private void defaultAppResolve(){
 
@@ -143,15 +143,29 @@ public class ConversationsListActivity extends MyActivity{
     }
 
     private void fetchConversations() {
-        /* We save data in static field.  So if activity is destroid we
-         * won't need to re-fetch the data , because it was saved in field.
-         */
-//      if(isFetched) return;
         SmartConversationFetcher task = new SmartConversationFetcher(getBaseContext(),INITIAL_CONVERSATION_LOAD_NUM,listAdapter);
         task.execute();
-//      isFetched = true; // now it's fetched.
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.i(TAG,"bla bla");
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
+            overridePendingTransition(R.animator.abc_slide_in_left, R.anim.abc_fade_out);
+        }
+        return true;
+    }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Conversation conversation = listAdapter.getItem(position);
+        Contact contact = conversation.getContact();
 
+        Intent i = new Intent(ConversationsListActivity.this,ConversationActivity.class);
+        i.putExtra(Constants.CONTACT_BUNDLE,contact != null? contact.getBundle() : null);
+
+        i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(i);
+        //overridePendingTransition(R.animator.abc_slide_in_left, R.anim.abc_fade_out);
+    }
 }

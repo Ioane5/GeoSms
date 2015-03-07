@@ -9,9 +9,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -26,14 +26,7 @@ import com.ioane.sharvadze.geosms.Utils;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Date;
-import java.util.HashMap;
 
 
 public class ConversationActivity extends MyActivity implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -108,7 +101,6 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         }.execute(threadId);
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -121,7 +113,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         }else {
             Integer i = contact.getId();
             Log.i(TAG,"i = "+i);
-            editor.putString(contact.getAddress(),editText.getText().toString());
+            editor.putString(contact.getAddress(), editText.getText().toString());
         }
         editor.commit();
     }

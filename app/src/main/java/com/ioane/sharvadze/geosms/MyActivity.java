@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,6 +23,13 @@ public class MyActivity extends ActionBarActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.animator.abc_slide_out_left, R.anim.abc_fade_out);
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -32,6 +40,10 @@ public class MyActivity extends ActionBarActivity {
                 Intent i = new Intent(MyActivity.this,SettingsActivity.class);
                 startActivity(i);
                 return true;
+//            case android.R.id.home:
+//                finish();
+//                overridePendingTransition(R.animator.abc_slide_out_left, R.anim.abc_fade_out);
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

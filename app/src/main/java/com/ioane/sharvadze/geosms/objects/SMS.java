@@ -9,8 +9,6 @@ import android.util.Log;
 import com.ioane.sharvadze.geosms.Constants;
 import com.ioane.sharvadze.geosms.Constants.MESSAGE;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
