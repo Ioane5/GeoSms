@@ -37,11 +37,13 @@ public class MagtifunWebSms extends AbstractWebSms {
     public static final String MESSAGE_BODY = "message_body";
     public static final String SEND_ADDRESS = "recipients";
     public static final String HOST = "www.magtifun.ge";
-    static {
-        LOGIN_URL = "http://www.magtifun.ge/index.php?page=11&lang=ge";
-        SEND_URL = "/scripts/sms_send.php";
+    public static final String UTF_8 = "UTF-8";
 
+    static {
+        LOGIN_URL = "/index.php?page=11&lang=ge";
+        SEND_URL = "/scripts/sms_send.php";
     }
+
     private Context ctx;
 
     public MagtifunWebSms(String userName, String password,String cookie,Context ctx) {
@@ -59,20 +61,21 @@ public class MagtifunWebSms extends AbstractWebSms {
      */
     @Override
     public boolean authenticate() {
-        Log.i(TAG,"authenticate");
         try {
             HttpClient httpclient = new DefaultHttpClient();
-
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(7);
             nameValuePairs.add(new BasicNameValuePair(FIELDS.USER, userName));
             nameValuePairs.add(new BasicNameValuePair(FIELDS.PASSWORD, password));
             nameValuePairs.add(new BasicNameValuePair("remember", "on"));
+            nameValuePairs.add(new BasicNameValuePair("act", "1"));
+
 
             HttpPost httppost =  new HttpPost(LOGIN_URL);
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,UTF_8));
             httppost.setHeader(new BasicHeader("Content-type" , "application/x-www-form-urlencoded"));
 
-            HttpResponse response = httpclient.execute(httppost);
+
+            HttpResponse response = httpclient.execute(new HttpHost(HOST),httppost);
 
             StatusLine statusLine = response.getStatusLine();
 
@@ -81,14 +84,12 @@ public class MagtifunWebSms extends AbstractWebSms {
 
                 response.getEntity().writeTo(out);
                 String responseString = out.toString();
-
                 if(!parseLoginHTML(responseString)){
                     return false;
                 }
                 Header[] headers = response.getHeaders(FIELDS.SET_COOKIE);
                 // This will find out cookie
                 setCookieFromHeader(headers);
-
                 out.close();
                 return true;
                 //..more logic
@@ -123,7 +124,7 @@ public class MagtifunWebSms extends AbstractWebSms {
                     if(token.length() > 6) {
                         this.cookie = token;
                         MyPreferencesManager.saveCookie(
-                                PreferenceManager.getDefaultSharedPreferences(ctx.getApplicationContext()),this.cookie);
+                        PreferenceManager.getDefaultSharedPreferences(ctx.getApplicationContext()),this.cookie);
                         return;
                     }
                 }
@@ -138,6 +139,7 @@ public class MagtifunWebSms extends AbstractWebSms {
             return false;
         }
         try {
+            address = address.replaceAll("\\s+","");
             HttpClient httpclient = new DefaultHttpClient();
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(7);
@@ -148,7 +150,7 @@ public class MagtifunWebSms extends AbstractWebSms {
             httppost.addHeader(new BasicHeader(FIELDS.COOKIE, this.cookie));
             httppost.addHeader(new BasicHeader("Content-type" , "application/x-www-form-urlencoded"));
 
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,UTF_8));
 
             HttpResponse response = httpclient.execute(new HttpHost(HOST),httppost);
             StatusLine statusLine = response.getStatusLine();

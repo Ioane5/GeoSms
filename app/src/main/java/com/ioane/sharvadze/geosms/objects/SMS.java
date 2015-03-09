@@ -180,6 +180,7 @@ public class SMS {
         }
         msgs[0].getUserData();
         ContentValues cv = new ContentValues();
+
         cv.put(Constants.ADDRESS,msgs[0].getOriginatingAddress());
         cv.put(MESSAGE.BODY,messageText.toString());
         cv.put(MESSAGE.PROTOCOL,msgs[0].getProtocolIdentifier());

@@ -1,35 +1,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/conversations_list_horizontal_margin"
-    android:paddingRight="@dimen/conversations_list_horizontal_margin"
-    android:paddingTop="@dimen/conversations_list_vertical_margin"
-    android:paddingBottom="@dimen/conversations_list_vertical_margin" tools:context=".ChatList"
-    android:background="#ffffff"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
 
+    tools:context="com.ioane.sharvadze.geosms.conversationsList.ConversationsListActivity"
+    android:orientation="vertical"
+    android:background="@color/white"
+    >
+
+
+    <QuickContactBadge
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/quick_contact"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/not_default_app">
+        android:id="@+id/not_default_app"
+        >
 
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:background="@color/darkgreen"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:background="@color/black"
             android:text="@string/set_default_app"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:textColor="#ffffff"
             android:id="@+id/change_default_app"
             />
 
     </LinearLayout>
 
     <ListView
+        android:paddingLeft="@dimen/conversations_list_horizontal_margin"
+        android:paddingRight="@dimen/conversations_list_horizontal_margin"
+        android:paddingTop="@dimen/conversations_list_vertical_margin"
+        android:paddingBottom="@dimen/conversations_list_vertical_margin"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/conversations_list_view"
-
         android:divider="@android:color/transparent"
-        android:dividerHeight="1dp"
+        android:dividerHeight="0dp"
         />
 
 

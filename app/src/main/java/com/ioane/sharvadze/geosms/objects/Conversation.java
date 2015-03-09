@@ -14,6 +14,8 @@ public class Conversation {
 
     private static final String RECIPIENT_ID = Constants.RECIPIENT_ID;
 
+    private static final String THREAD_ID = Constants.ID;
+
     private static final String LAST_MESSAGE = Constants.CONVERSATION_LAST_MESSAGE;
 
     private static final String DATE = Constants.CONVERSATION_DATE;
@@ -60,9 +62,9 @@ public class Conversation {
         this.lastMessage = cursor.getString(cursor.getColumnIndex(LAST_MESSAGE));
         this.date = new Date(cursor.getLong(cursor.getColumnIndex(DATE)));
         this.messageRead = cursor.getInt(cursor.getColumnIndex(IS_READ)) == 1;
-
+        int threadId = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
         if(resolveContact){
-            this.contact = new Contact(context,recipientId);
+            this.contact = new Contact(context,recipientId,threadId);
         }
     }
 
@@ -104,5 +106,22 @@ public class Conversation {
 
     public void setRecipientId(int recipientId) {
         this.recipientId = recipientId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Conversation that = (Conversation) o;
+
+        if (recipientId != that.recipientId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return recipientId;
     }
 }

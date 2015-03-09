@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,6 +22,7 @@ import com.ioane.sharvadze.geosms.GeoSmsManager;
 import com.ioane.sharvadze.geosms.MyActivity;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.Utils;
+import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
@@ -59,7 +59,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
         if(!Utils.isDefaultSmsApp(this)){
             editText.setFocusable(false);
-            editText.setText(R.string.set_default_app_to_send);
+            editText.setHint(R.string.set_default_app_to_send);
         }else {
             SharedPreferences drafts = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
             String text = drafts.getString(contact.getAddress(),null);
@@ -69,8 +69,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
         Bundle bundle = new Bundle();
         bundle.putInt(Constants.RECIPIENT_ID, contact.getThreadId());
-        getLoaderManager().initLoader(0,bundle,this);
         markConversationAsRead(contact);
+        getLoaderManager().initLoader(0, bundle, this);
     }
 
 
@@ -86,7 +86,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     }
 
 
-    private void markConversationAsRead(Contact contact){
+    private void markConversationAsRead(final Contact contact){
         int threadId = contact.getThreadId();
         new AsyncTask<Integer,Void,Void>(){
 
@@ -95,6 +95,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 int threadId = params[0];
                 ContentValues cv =  new ContentValues();
                 cv.put(Constants.MESSAGE.READ,1);
+                ConversationsListUpdater.markAsRead(threadId);
                 getContentResolver().update(Uri.parse("content://sms"),cv , ("thread_id = " + threadId), null);
                 return null;
             }
@@ -104,7 +105,9 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
+        if(!editText.isFocusable()) return; // not save when it's not default
         SharedPreferences drafts = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
         SharedPreferences.Editor editor = drafts.edit();
 
@@ -112,7 +115,6 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             editor.remove(contact.getAddress());
         }else {
             Integer i = contact.getId();
-            Log.i(TAG,"i = "+i);
             editor.putString(contact.getAddress(), editText.getText().toString());
         }
         editor.commit();
@@ -121,10 +123,9 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         int thread_id = args.getInt(Constants.RECIPIENT_ID);
-        Uri uri = Uri.parse("content://sms");
-        Log.i(TAG,"thread_id = "+ thread_id);
-        //Telephony.Sms.CONTENT_URI
-        return new CursorLoader(getBaseContext(),Uri.parse("content://sms"),null,("thread_id = " + thread_id),null,"date asc");
+        Uri uri = Uri.parse("content://sms/");
+        return new CursorLoader(getBaseContext(),uri,null,"thread_id = ?" ,
+                new String[]{Integer.toString(thread_id)},"date asc");
     }
 
     @Override
@@ -154,7 +155,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         public SendButtonListener(Contact contact){
             this.contact = contact;
             smsManager = new GeoSmsManager((ListView)findViewById(R.id.conversation_list_view),
-                    getBaseContext());
+                    getBaseContext(),contact);
         }
         @Override
         public void onClick(View view) {

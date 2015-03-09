@@ -24,7 +24,7 @@ public class NotificationBuilder {
         if(contact.getPhotoUri() == null){
             photo =  BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.no_image);
         }else {
-            photo = Utils.getPhotoFromURI(contact.getPhotoUri(),ctx,4);
+            photo = Utils.getPhotoFromURI(contact.getPhotoUri(),ctx,100);
         }
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
@@ -32,7 +32,10 @@ public class NotificationBuilder {
                         .setSmallIcon(R.mipmap.geosms_icon)
                         .setContentTitle(contact.getName() == null? contact.getAddress():contact.getName())
                         .setContentText(sms.getText())
-                        .setDefaults(Notification.DEFAULT_ALL);
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setCategory(Notification.CATEGORY_MESSAGE);
+
+
 
 
         // Creates an explicit intent for an Activity in your app
@@ -54,9 +57,12 @@ public class NotificationBuilder {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
+        resultIntent.putExtra(Constants.CONTACT_BUNDLE,contact.getBundle());
         mBuilder.setContentIntent(resultPendingIntent);
         mBuilder.setOnlyAlertOnce(true); // TODO check what is this...
         mBuilder.setAutoCancel(true);
-        return mBuilder.build();
+        Notification notification = mBuilder.build();
+        // TODO check if this is better approach
+        return notification;
     }
 }

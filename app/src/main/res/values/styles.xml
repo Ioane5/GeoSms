@@ -8,6 +8,10 @@
         <item name="android:actionMenuTextColor">@color/blue</item>
     </style>
 
+    <style name="activated" parent="AppTheme">
+        <item name="android:background">?android:attr/activatedBackgroundIndicator</item>
+    </style>
+
     <!-- ActionBar styles -->
     <style name="MyActionBar"
         parent="@android:style/Widget.Holo.ActionBar">

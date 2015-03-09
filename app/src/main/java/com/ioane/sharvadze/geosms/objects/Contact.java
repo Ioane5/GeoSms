@@ -49,13 +49,15 @@ public class Contact implements Serializable{
     };
 
     private static final String ID = "id";
+    private static final String THREAD_ID = "thread_id";
     private static final String NAME = "name";
     private static final String PHOTO = "photo";
     private static final String PHOTO_URI = "photo_uri";
     private static final String ADDRESS = "address";
 
     public Contact(Bundle contactData){
-        this.threadId = contactData.getInt(ID);
+        this.threadId = contactData.getInt(THREAD_ID);
+        this.id = contactData.getInt(ID);
         this.name = contactData.getString(NAME);
         this.photoUri =  contactData.getString(PHOTO_URI);
         this.address = contactData.getString(ADDRESS);
@@ -64,7 +66,8 @@ public class Contact implements Serializable{
 
     public Bundle getBundle(){
         Bundle bundle = new Bundle();
-        bundle.putInt(ID,threadId);
+        bundle.putInt(ID,id);
+        bundle.putInt(THREAD_ID,threadId);
         bundle.putString(NAME,name);
         bundle.putString(PHOTO_URI,photoUri);
         bundle.putString(ADDRESS,address);
@@ -92,24 +95,25 @@ public class Contact implements Serializable{
 
     public Contact(Context context,String address){
         initFromAddress(context,address);
-        //  get id from address...
-        Cursor c = context.getContentResolver().query(
-                Uri.parse("content://mms-sms/canonical-addresses"), new String[]{"_id"},
-                "address" + " = ?",
-                new String[]{address}, null);
-
-        if (c != null) {
-            if (c.getCount() != 0) {
-                c.moveToNext();
-                setThreadId(c.getInt(c.getColumnIndex("_id")));
-            }
-            c.close();
-        }
+//        //  get id from address...
+//        Cursor c = context.getContentResolver().query(
+//                Uri.parse("content://mms-sms/canonical-addresses"), new String[]{"_id"},
+//                "address = ? ", new String[]{address}, null);
+//        if (c != null) {
+//            if (c.getCount() != 0) {
+//
+//                c.moveToNext();
+//                int id = c.getInt(c.getColumnIndex("_id"));
+//                Log.i(TAG,"ID IS " + id);
+//                setThreadId(id);
+//            }
+//            c.close();
+//        }
     }
 
 
-    public Contact(Context context,int recipientId){
-        setThreadId(recipientId);
+    public Contact(Context context,int recipientId,int threadId){
+        setThreadId(threadId);
         setAddress(null);
         setName(null);
         setPhotoUri(null);
@@ -119,11 +123,12 @@ public class Contact implements Serializable{
                 null, null, null, null);
         if(c.moveToFirst()){
             String address = c.getString(0);
-            c.close();
             if(address != null)
+                address = Utils.removeWhitespaces(address);
                 initFromAddress(context,address);
-        }else
-            c.close();
+        }
+
+        c.close();
 
     }
 
@@ -188,7 +193,8 @@ public class Contact implements Serializable{
     @Override
     public String toString() {
         return "Contact{" +
-                "threadId=" + threadId +
+                "id= " + id +
+                ", threadId=" + threadId +
                 ", name='" + name + '\'' +
                 ", photoUri='" + photoUri + '\'' +
                 ", address='" + address + '\'' +

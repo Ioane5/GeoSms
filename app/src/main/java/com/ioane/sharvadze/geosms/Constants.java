@@ -12,6 +12,8 @@ public interface Constants {
 
     String RECIPIENT_ID = "recipient_ids";
 
+    String ID = "_id";
+
     String CONVERSATION_LAST_MESSAGE = "snippet";
 
     String CONVERSATION_DATE = "date";
@@ -19,6 +21,8 @@ public interface Constants {
     String CONVERSATION_READ = "read";
 
     String DRAFTS_FILE = "drafts";
+
+    String THREAD_ID = "thread_id";
 
     /**
      * For intent

@@ -14,11 +14,12 @@ import java.util.List;
 /**
  * Created by Ioane on 2/24/2015.
  */
-public class SmartConversationFetcher extends AsyncTask<Void, Void, List<Conversation>>{
+public class SmartConversationFetcher extends AsyncTask<Void,  List<Conversation>,Void>{
 
     private Context context;
     private int initialLoadingNum;
     private ArrayAdapter<Conversation> adapter;
+    private static final Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
 
     private Cursor c;
 
@@ -39,45 +40,29 @@ public class SmartConversationFetcher extends AsyncTask<Void, Void, List<Convers
     }
 
     @Override
-    protected List<Conversation> doInBackground(Void ... params) {
+    protected Void doInBackground(Void ... params) {
         List<Conversation> list = new ArrayList<Conversation>();
-        Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
+        // listen for db changes.
         c = context.getContentResolver().query(uri, null, null, null, "date desc");
         int i = 0;
         while(c.moveToNext()){
-            if(i++ >= initialLoadingNum) break;
-            list.add(new Conversation(context,c,true));
+            list.add(new Conversation(context, c, true));
+            if(++i % initialLoadingNum == 0) {
+                publishProgress(list);
+                list = new ArrayList<Conversation>();
+            }
         }
-        return list;
+        publishProgress(list);
+        c.close();
+        return null;
     }
 
     @Override
-    protected void onPostExecute(List<Conversation> conversations) {
-        super.onPostExecute(conversations);
-        adapter.addAll(conversations);
-        if(c.isAfterLast()) {
-            c.close();
-            return; // we already loaded data.
-        }
-
-
-        // This task finishes loading...
-        new AsyncTask<Cursor, Void, List<Conversation>>() {
-            @Override
-            protected List<Conversation> doInBackground(Cursor... params) {
-                List<Conversation> list = new ArrayList<Conversation>();
-                Cursor c = params[0];
-                while (c.moveToNext()){
-                    list.add(new Conversation(context,c,true));
-                }
-                c.close();
-                return list;
-            }
-            @Override
-            protected void onPostExecute(List<Conversation> conversations) {
-                super.onPostExecute(conversations);
-                adapter.addAll(conversations);
-            }
-        }.execute(c);
+    protected void onProgressUpdate(List<Conversation>... values) {
+        super.onProgressUpdate(values);
+        List<Conversation> part = values[0];
+        adapter.addAll(part);
     }
+
+
 }

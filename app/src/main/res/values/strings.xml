@@ -16,6 +16,7 @@
     <string name="pref_websms_clients">Web Sms Client</string>
     <string name="summary">password</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="menu_delete">Delete</string>
 
 
 </resources>

@@ -2,6 +2,7 @@ package com.ioane.sharvadze.geosms;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
@@ -84,5 +84,20 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static int getSmsThreadId(Context ctx,Uri uri) {
+        Cursor c = ctx.getContentResolver().query(uri,new String[]{Constants.THREAD_ID},null,null,null);
+        if(c.moveToFirst()){
+            Integer i = c.getInt(c.getColumnIndex(Constants.THREAD_ID));
+            c.close();
+            return i== null? 0: i;
+        }else c.close();
+
+        return 0;
+    }
+
+    public static String removeWhitespaces(String address) {
+        return address.replaceAll("\\s+","");
     }
 }

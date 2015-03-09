@@ -3,18 +3,26 @@ package com.ioane.sharvadze.geosms.conversationsList;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
 import com.ioane.sharvadze.geosms.Constants;
@@ -26,6 +34,7 @@ import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConversationsListActivity extends MyActivity implements AdapterView.OnItemClickListener{
 
@@ -37,12 +46,19 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
     private ArrayAdapter<Conversation> listAdapter;
 
+    private static boolean onResume = false;
+
+    private SelectionAdapter mAdapter;
+
+
     /**
      * This means how many conversations to fetch at first time.
      * And than we will fetch by thread in parallel to not make
      * user wait.
      */
     private final int INITIAL_CONVERSATION_LOAD_NUM = 8;
+
+    private static List<Integer> updateConversations =  new ArrayList<Integer>();
 
 
     /**
@@ -55,6 +71,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         super.onCreate(savedInstanceState);
         setTitle(R.string.main_title);
         setContentView(R.layout.activity_conversations_list);
+        // if it's default app , it changes layout.
+        defaultAppResolve();
 
         listAdapter = new ConversationsListAdapter(getBaseContext(),
                 R.layout.conversation_item,new ArrayList<Conversation>());
@@ -62,16 +80,66 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // fetch before we show...
         Log.i(TAG,"Fetching data...");
         fetchConversations();
-
+        new ConversationsListUpdater(this,listAdapter);
         conversationList = (ListView) findViewById(R.id.conversations_list_view);
         conversationList.setAdapter(listAdapter);
-        defaultAppResolve();
         // Listen to clicks
         conversationList.setOnItemClickListener(this);
+        // listen for conversation updates
+        initMultiChoiceListView(conversationList);
     }
 
 
+    private void initMultiChoiceListView(ListView listView){
+        conversationList.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        conversationList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            SparseBooleanArray checkedItems = new SparseBooleanArray();
 
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                // Here you can do something when items are selected/de-selected,
+                // such as update the title in the CAB
+                Log.i(TAG,"onItemCheckedStateChanged" +position);
+                checkedItems.put(position,checked);
+                if(checked){
+                    Log.i(TAG,"setting checked");
+                    listAdapter.getView(position,null,null).setBackgroundColor(Color.BLACK);
+                }else {
+                    listAdapter.getView(position,null,null).setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                // Inflate the menu for the CAB
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.conversations_list_cab, menu);
+                return true;
+            }
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                // Here you can perform updates to the CAB due to
+                // an invalidate() request
+                return false;
+            }
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                // Respond to clicks on the actions in the CAB
+                switch (item.getItemId()) {
+                    case R.id.menu_delete:
+                        //deleteSelectedItems();
+                        mode.finish(); // Action picked, so close the CAB
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                // Here you can make any necessary updates to the activity when
+                // the CAB is removed. By default, selected items are deselected/unchecked.
+            }
+        });
+    }
     public void onContactImageClick(View v){
         Log.i(TAG,"contact clicked " + v.getClass().getSimpleName());
 
@@ -88,12 +156,14 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                 intent.putExtra(ContactsContract.Intents.Insert.PHONE, contact.getAddress());
                 intent.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE,
                         ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                startActivity(intent);
             }else {
                 Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
-                intent = new Intent(Intent.ACTION_VIEW, uri);
+                ContactsContract.QuickContact.showQuickContact(this,(View)findViewById(R.id.quick_contact),uri,
+                        ContactsContract.QuickContact.MODE_MEDIUM,null);
             }
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            startActivity(intent);
         }
     }
 

@@ -53,6 +53,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:layout_marginLeft="13dp"
+            android:scrollbars="vertical"
+            android:inputType="textShortMessage|textMultiLine"
+            android:singleLine="false"
             android:hint="@string/edit_text_hint"
             android:id="@+id/enter_message_edit_text"
             />

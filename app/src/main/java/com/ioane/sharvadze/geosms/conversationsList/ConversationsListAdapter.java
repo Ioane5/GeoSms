@@ -1,8 +1,6 @@
 package com.ioane.sharvadze.geosms.conversationsList;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -13,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.Utils;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
@@ -97,8 +94,12 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
 
         if(!conversation.isMessageRead()){
             holder.messageView.setTypeface(null, Typeface.BOLD_ITALIC);
+            holder.contactNameView.setTypeface(null, Typeface.BOLD_ITALIC);
+            holder.messageDateView.setTypeface(null, Typeface.BOLD_ITALIC);
         }else{
             holder.messageView.setTypeface(null,Typeface.NORMAL);
+            holder.contactNameView.setTypeface(null,Typeface.NORMAL);
+            holder.messageDateView.setTypeface(null, Typeface.NORMAL);
         }
 
         return view;

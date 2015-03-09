@@ -14,6 +14,9 @@
     <item name="black" type="color">#ff000000</item>
 
     <item name="theme_green" type="color">#ff44cc0a</item>
+    <item name="conversation_list_color" type="color">#ff4e4e4e</item>
+    <item name="white" type="color">#ffffff</item>
+
 
     <integer-array name="androidcolors">
         <item>@color/blue</item>
