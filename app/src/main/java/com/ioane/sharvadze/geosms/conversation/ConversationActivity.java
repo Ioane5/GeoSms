@@ -117,7 +117,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             Integer i = contact.getId();
             editor.putString(contact.getAddress(), editText.getText().toString());
         }
-        editor.apply();
+        editor.commit();
     }
 
     @Override
@@ -134,16 +134,14 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
-    }
-
-
     private boolean isSendWeb(){
         return webUseToggle.isChecked();
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
 
 
     /**

@@ -25,11 +25,13 @@ public class ConversationsListUpdater extends ContentObserver {
     private Context ctx;
     private ArrayAdapter<Conversation> listAdapter;
 
+    private Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
+
+
     public ConversationsListUpdater(Context ctx,ArrayAdapter<Conversation> listAdapter){
         super(null);
         this.ctx = ctx;
         this.listAdapter = listAdapter;
-        Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
         ctx.getContentResolver().registerContentObserver(uri,true,this);
     }
 
@@ -69,7 +71,6 @@ public class ConversationsListUpdater extends ContentObserver {
                 synchronized (updateConversations) {
                     if (updateConversations.size() == 0) return null;
                     Log.i(TAG, "updating conversations");
-                    Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
                     for (int recipientId : updateConversations) {
                         Cursor c = ctx.getContentResolver().query(uri, null, "_id = ?",
                                 new String[]{Integer.toString(recipientId)}, null);

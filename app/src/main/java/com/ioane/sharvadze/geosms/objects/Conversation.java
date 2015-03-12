@@ -2,6 +2,7 @@ package com.ioane.sharvadze.geosms.objects;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.SparseArray;
 
 import com.ioane.sharvadze.geosms.Constants;
 
@@ -21,8 +22,6 @@ public class Conversation {
     private static final String DATE = Constants.CONVERSATION_DATE;
 
     private static final String IS_READ = Constants.CONVERSATION_READ;
-
-
 
     /**
      * Conversation with
@@ -66,6 +65,31 @@ public class Conversation {
         if(resolveContact){
             this.contact = new Contact(context,recipientId,threadId);
         }
+    }
+
+    /**
+     * This constructor is for working with cache.
+     *
+     * If contact was in cache we won't resolve contact
+     * but will get directly from cache.
+     *
+     * @param context
+     * @param cursor
+     * @param contactCache
+     */
+    public Conversation(Context context,Cursor cursor,SparseArray<Contact> contactCache){
+        this.recipientId = cursor.getInt(cursor.getColumnIndex(RECIPIENT_ID));
+        this.lastMessage = cursor.getString(cursor.getColumnIndex(LAST_MESSAGE));
+        this.date = new Date(cursor.getLong(cursor.getColumnIndex(DATE)));
+        this.messageRead = cursor.getInt(cursor.getColumnIndex(IS_READ)) == 1;
+        int threadId = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
+
+        Contact cached= contactCache.get(recipientId,null);
+        if(cached == null){
+            this.contact = new Contact(context,recipientId,threadId);
+            contactCache.put(recipientId,this.contact); // save to cache
+        }else
+            this.contact = cached; // we had in cache
     }
 
     public Contact getContact() {
