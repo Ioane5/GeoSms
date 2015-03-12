@@ -40,6 +40,14 @@ public class ConversationsListUpdater extends ContentObserver {
         updateConversations();
     }
 
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        super.onChange(selfChange, uri);
+        Log.i(TAG,uri == null? "null uri" :uri.toString());
+    }
+
+
+
     public static void updateConversation(int updatedThreadId){
         synchronized (updateConversations){
             updateConversations.add(updatedThreadId);

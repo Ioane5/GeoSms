@@ -17,6 +17,10 @@
     <string name="summary">password</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="menu_delete">Delete</string>
+    <string name="delete_warning_msg_single">Delete this conversation?</string>
+    <string name="delete_warning_msg_plural">Delete these conversations?</string>
+    <string name="warning">Warning</string>
+
 
 
 </resources>

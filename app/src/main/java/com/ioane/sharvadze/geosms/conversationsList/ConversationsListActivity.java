@@ -1,28 +1,21 @@
 package com.ioane.sharvadze.geosms.conversationsList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
 import com.ioane.sharvadze.geosms.Constants;
@@ -47,8 +40,6 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     private ArrayAdapter<Conversation> listAdapter;
 
     private static boolean onResume = false;
-
-    private SelectionAdapter mAdapter;
 
 
     /**
@@ -91,55 +82,10 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
 
     private void initMultiChoiceListView(ListView listView){
-        conversationList.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        conversationList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            SparseBooleanArray checkedItems = new SparseBooleanArray();
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                // Here you can do something when items are selected/de-selected,
-                // such as update the title in the CAB
-                Log.i(TAG,"onItemCheckedStateChanged" +position);
-                checkedItems.put(position,checked);
-                if(checked){
-                    Log.i(TAG,"setting checked");
-                    listAdapter.getView(position,null,null).setBackgroundColor(Color.BLACK);
-                }else {
-                    listAdapter.getView(position,null,null).setBackgroundColor(Color.TRANSPARENT);
-                }
-            }
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // Inflate the menu for the CAB
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.conversations_list_cab, menu);
-                return true;
-            }
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                // Here you can perform updates to the CAB due to
-                // an invalidate() request
-                return false;
-            }
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                // Respond to clicks on the actions in the CAB
-                switch (item.getItemId()) {
-                    case R.id.menu_delete:
-                        //deleteSelectedItems();
-                        mode.finish(); // Action picked, so close the CAB
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                // Here you can make any necessary updates to the activity when
-                // the CAB is removed. By default, selected items are deselected/unchecked.
-            }
-        });
+        new ConversationsListCAB(getApplicationContext(),listView,listAdapter,
+                new AlertDialog.Builder(ConversationsListActivity.this));
     }
+
     public void onContactImageClick(View v){
         Log.i(TAG,"contact clicked " + v.getClass().getSimpleName());
 
