@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--
     <android:uses-permission
@@ -35,9 +36,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat.Light" >
+        android:theme="@style/CustomActionBarTheme" >
         <receiver
-            android:name=".SmsDispatcher"
+            android:name="broadcastReceivers.SmsDispatcher"
             android:permission="android.permission.BROADCAST_SMS" >
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
@@ -45,9 +46,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- BroadcastReceiver that listens for Our Notifications -->
+        <receiver android:name=".MyNotificationManager" >
+            <intent-filter>
+                <action android:name="notification_dismissed" />
+            </intent-filter>
+        </receiver>
+
         <!-- BroadcastReceiver that listens for incoming MMS messages -->
         <receiver
-            android:name=".MmsReceiver"
+            android:name="broadcastReceivers.MmsReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH" >
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -62,25 +70,26 @@
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".conversation.ConversationActivity"
             android:label="@string/title_activity_conversation"
             android:parentActivityName=".conversationsList.ConversationsListActivity"
-            android:windowSoftInputMode="adjustResize"
-            >
+            android:windowSoftInputMode="adjustResize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".conversationsList.ConversationsListActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="sms" />
                 <data android:scheme="smsto" />
                 <data android:scheme="mms" />
@@ -89,7 +98,7 @@
         </activity>
 
         <service
-            android:name=".HeadlessSmsSendService"
+            android:name="broadcastReceivers.HeadlessSmsSendService"
             android:exported="true"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE" >
             <intent-filter>
@@ -107,6 +116,14 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name=".SettingsTestActivity"
+            android:label="@string/title_activity_settings_test" >
+        </activity>
+        <activity
+            android:name=".NewConversatonActivity"
+            android:label="@string/title_activity_new_conversaton" >
         </activity>
     </application>
 

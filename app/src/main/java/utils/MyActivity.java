@@ -1,9 +1,12 @@
-package com.ioane.sharvadze.geosms;
+package utils;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.ioane.sharvadze.geosms.R;
+import com.ioane.sharvadze.geosms.SettingsActivity;
 
 /**
  * Created by Ioane on 3/5/2015.

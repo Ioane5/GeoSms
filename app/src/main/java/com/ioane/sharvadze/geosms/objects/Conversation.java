@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.SparseArray;
 
-import com.ioane.sharvadze.geosms.Constants;
+import utils.Constants;
 
 import java.util.Date;
 

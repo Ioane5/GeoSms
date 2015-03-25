@@ -5,10 +5,8 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.ListView;
@@ -16,38 +14,37 @@ import android.widget.Toast;
 
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
-import com.ioane.sharvadze.geosms.websms.AbstractWebSms;
+import com.ioane.sharvadze.geosms.websms.SyncedWebSms;
+import com.ioane.sharvadze.geosms.websms.WebSms;
 
 import java.util.ArrayList;
+
+import broadcastReceivers.SmsDispatcher;
+import utils.Constants;
 
 /**
  * Created by Ioane on 3/1/2015.
  */
-public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class GeoSmsManager {
     private Contact contact;
     private ListView listView;
     private Context context;
 
     private static final String TAG = GeoSmsManager.class.getSimpleName();
 
-    private AbstractWebSms webSmsManager;
+    private WebSms webSmsManager;
 
     public GeoSmsManager(ListView listView,Context context,Contact contact){
         this.listView = listView;
         this.context = context;
         this.contact = contact;
-        
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        this.webSmsManager = MyPreferencesManager.getWebSmsManager(prefs,context);
-        prefs.registerOnSharedPreferenceChangeListener(this);
+        this.webSmsManager = new SyncedWebSms(context);
     }
 
 
 
     PendingIntent pendingIntent;
 
-    private String SENT = "SMS_SENT";
-    private String DELIVERED = "SMS_DELIVERED";
 
     public void sendSms(SMS sms, String address,Boolean web){
         // TODO add web checking.
@@ -68,6 +65,7 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
                 ContentValues values = sms.getContentValues();
                 values.put(Constants.ADDRESS,address);
                 Uri insertedSmsURI = context.getContentResolver().insert(Uri.parse("content://sms/"), values);
+
                 Intent sentPI = new Intent(Constants.Actions.MESSAGE_SENT, insertedSmsURI , context.getApplicationContext(), SmsDispatcher.class);
                 sentPI.putExtra(Constants.RECIPIENT_ID,contact.getThreadId());
 
@@ -136,19 +134,6 @@ public class GeoSmsManager implements SharedPreferences.OnSharedPreferenceChange
 
     public void updateSms(SMS sms){
 
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(webSmsManager == null &&!MyPreferencesManager.WEBSMS_NAME.equals(key))
-            return;
-        if(MyPreferencesManager.WEBSMS_NAME.equals(key)){
-            this.webSmsManager = MyPreferencesManager.getWebSmsManager(sharedPreferences,context);
-        }else if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
-            this.webSmsManager.setUserName(sharedPreferences.getString(MyPreferencesManager.WEBSMS_USERNAME,""));
-        }if(MyPreferencesManager.WEBSMS_PASSWORD.equals(key)){
-            this.webSmsManager.setPassword(sharedPreferences.getString(MyPreferencesManager.WEBSMS_PASSWORD, ""));
-        }
     }
 
 }

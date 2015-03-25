@@ -6,7 +6,7 @@
     android:paddingBottom="@dimen/conversation_vertical_margin"
     tools:context="com.ioane.sharvadze.geosms.conversation.ConversationActivity"
     android:orientation="vertical"
-    android:background="#ffffff"
+    android:focusableInTouchMode="true"
     >
 
     <ListView
@@ -16,24 +16,22 @@
         android:id="@+id/conversation_list_view"
 
         android:divider="@android:color/transparent"
-        android:dividerHeight="0.5dp"
+        android:dividerHeight="0dp"
         android:stackFromBottom="true"
         android:background="#ffffffff"
         android:transcriptMode="normal"
         />
 
-    <LinearLayout
-        android:focusable="true" android:focusableInTouchMode="true"
-        android:layout_width="0px" android:layout_height="0px"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_margin="5dp"
         >
 
         <ToggleButton
-            android:textSize="10sp"
+            android:gravity="bottom"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
             android:layout_marginLeft="7dp"
@@ -45,17 +43,25 @@
             android:textOn=""
             android:layout_weight="0.01"
             android:id="@+id/use_web_toggle_button"/>
-        <EditText
 
+        <EditText
             android:background="#ffffffff"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="13dp"
+
+            android:padding="10dp"
+
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+
             android:scrollbars="vertical"
             android:inputType="textShortMessage|textMultiLine"
             android:singleLine="false"
+            android:maxLines="5"
             android:hint="@string/edit_text_hint"
             android:id="@+id/enter_message_edit_text"
             />
@@ -63,17 +69,22 @@
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@mipmap/send"
+            android:background="@drawable/send_button"
+            android:scaleType="fitCenter"
             android:layout_marginRight="7dp"
+            android:layout_marginEnd="7dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:focusableInTouchMode="true"
             android:clickable="true"
             android:id="@+id/send_button"
             />
 
         </LinearLayout>
 
-
-
+    <TextView
+        android:gravity="center"
+        android:textSize="15sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/symbol_counter"/>
 </LinearLayout>

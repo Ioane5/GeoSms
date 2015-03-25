@@ -9,7 +9,7 @@
         android:layout_height="30dp"
         android:layout_margin="10dp"
         android:drawingCacheQuality="low"
-        android:background="@mipmap/no_image"
+        android:background="@mipmap/ic_no_image"
         android:id="@+id/message_contact_photo"/>
 
 

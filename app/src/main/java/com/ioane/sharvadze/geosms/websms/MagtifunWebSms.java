@@ -1,11 +1,10 @@
 package com.ioane.sharvadze.geosms.websms;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.ioane.sharvadze.geosms.Constants;
+import utils.Constants;
 import com.ioane.sharvadze.geosms.MyPreferencesManager;
 
 import org.apache.http.Header;
@@ -30,7 +29,7 @@ import java.util.StringTokenizer;
 /**
  * Created by Ioane on 3/5/2015.
  */
-public class MagtifunWebSms extends AbstractWebSms {
+public class MagtifunWebSms implements WebSms {
 
     public static final String TAG = MagtifunWebSms.class.getSimpleName();
 
@@ -38,6 +37,23 @@ public class MagtifunWebSms extends AbstractWebSms {
     public static final String SEND_ADDRESS = "recipients";
     public static final String HOST = "www.magtifun.ge";
     public static final String UTF_8 = "UTF-8";
+
+    private String cookie;
+    private String userName;
+    private String password;
+    private String accountName;
+
+    /**
+     * Overriding webSms client must initialize this variable
+     * in static block.
+     */
+    private static String LOGIN_URL;
+
+    /**
+     * Overriding webSms client must initialize this variable
+     * in static block.
+     */
+    private static String SEND_URL;
 
     static {
         LOGIN_URL = "/index.php?page=11&lang=ge";
@@ -47,7 +63,8 @@ public class MagtifunWebSms extends AbstractWebSms {
     private Context ctx;
 
     public MagtifunWebSms(String userName, String password,String cookie,Context ctx) {
-        super(userName, password);
+        this.userName = userName;
+        this.password = password;
         this.cookie = cookie;
         accountName = Constants.MAGTIFUN;
         this.ctx = ctx;
@@ -63,7 +80,7 @@ public class MagtifunWebSms extends AbstractWebSms {
     public boolean authenticate() {
         try {
             HttpClient httpclient = new DefaultHttpClient();
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(7);
+            List<NameValuePair> nameValuePairs = new ArrayList<>(7);
             nameValuePairs.add(new BasicNameValuePair(FIELDS.USER, userName));
             nameValuePairs.add(new BasicNameValuePair(FIELDS.PASSWORD, password));
             nameValuePairs.add(new BasicNameValuePair("remember", "on"));
@@ -106,8 +123,9 @@ public class MagtifunWebSms extends AbstractWebSms {
     }
 
     /**
-     *
-     * @param html
+     * This method just checks html
+     * if user has logged in.
+     * @param html html to check
      * @return true if login successful.
      */
     private boolean parseLoginHTML(String html){
@@ -115,16 +133,15 @@ public class MagtifunWebSms extends AbstractWebSms {
     }
 
     private void setCookieFromHeader(Header[] cookies){
-        for (int i = 0; i < cookies.length; i++) {
-            String ck = cookies[i].getValue();
+        for (Header header:cookies) {
+            String ck = header.getValue();
             if (ck.contains("User=")){
                 StringTokenizer tokenizer = new StringTokenizer(ck," ");
                 while (tokenizer.hasMoreTokens()){
                     String token = tokenizer.nextToken();
                     if(token.length() > 6) {
                         this.cookie = token;
-                        MyPreferencesManager.saveCookie(
-                        PreferenceManager.getDefaultSharedPreferences(ctx.getApplicationContext()),this.cookie);
+                        MyPreferencesManager.saveCookie(ctx,this.cookie);
                         return;
                     }
                 }
@@ -142,7 +159,7 @@ public class MagtifunWebSms extends AbstractWebSms {
             address = address.replaceAll("\\s+","");
             HttpClient httpclient = new DefaultHttpClient();
 
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(7);
+            List<NameValuePair> nameValuePairs = new ArrayList<>(7);
             nameValuePairs.add(new BasicNameValuePair(MESSAGE_BODY, message));
             nameValuePairs.add(new BasicNameValuePair(SEND_ADDRESS, address));
 
@@ -164,10 +181,8 @@ public class MagtifunWebSms extends AbstractWebSms {
                 Log.i(TAG,responseString);
 
                 out.close();
-                if(!TextUtils.isEmpty(responseString) && responseString.equals("success"))
-                    return true;
-                else
-                    return false;
+                // if we got success response sendSms was successfull.
+                return !TextUtils.isEmpty(responseString) && responseString.equals("success");
             } else{
                 //Closes the connection.
                 response.getEntity().getContent().close();
@@ -183,5 +198,45 @@ public class MagtifunWebSms extends AbstractWebSms {
     @Override
     public int getNumMessages() {
         return 0;
+    }
+
+    @Override
+    public String getCookie() {
+        return cookie;
+    }
+
+    @Override
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String getUserName() {
+        return userName;
+    }
+
+    @Override
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    public void setAccountName(String name) {
+        this.accountName = name;
     }
 }

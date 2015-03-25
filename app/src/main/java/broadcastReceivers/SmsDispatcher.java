@@ -1,4 +1,4 @@
-package com.ioane.sharvadze.geosms;
+package broadcastReceivers;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -9,13 +9,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import utils.Constants;
+import com.ioane.sharvadze.geosms.MyNotificationManager;
+import utils.Utils;
 import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
-
-import java.util.Iterator;
 
 /**
  * Created by Ioane on 3/1/2015.
@@ -24,21 +27,41 @@ public class SmsDispatcher extends BroadcastReceiver {
 
     private static final String TAG = SmsDispatcher.class.getSimpleName();
 
+    private static final int VIBRATE_LENGTH = 100;
+
+
+    /**
+     * No thread is shown to user.
+     */
+    public static final int THREAD_ID_NONE  = -123123;
+
+    /**
+     * Saves current shown  threadId that user interacts with.
+     */
+    private static int currentThreadId = THREAD_ID_NONE;
+
+    public static void updateThreadId(int threadId){
+        currentThreadId = threadId;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.i(TAG,"onReceive() :" + action);
         if(action == null) return;
 
-        if(action.equals(Constants.Actions.MESSAGE_SENT)){
-            handleSmsSend(context,intent);
+        switch (action){
+            case Constants.Actions.MESSAGE_SENT:
+                handleSmsSend(context,intent);
+                break;
 
-        }else if(action.equals(Constants.Actions.MESSAGE_DELIVERED_1) ||
-                action.equals(Constants.Actions.MESSAGE_DELIVERED_2)){
-            handleSmsReceive(context,intent);
+            case Constants.Actions.MESSAGE_DELIVERED_1:
+            case Constants.Actions.MESSAGE_DELIVERED_2:
+                handleSmsReceive(context,intent);
+                break;
 
-        }else {
-            Log.w(TAG,"unknown action "+action);
+            default:
+                Log.w(TAG,"unknown action "+action);
         }
 
     }
@@ -54,23 +77,37 @@ public class SmsDispatcher extends BroadcastReceiver {
             protected Void doInBackground(Object... params) {
                 Context ctx = (Context)params[0];
                 Bundle bundle = (Bundle)params[1];
-                Iterator<String> it = bundle.keySet().iterator();
 
                 ContentValues values = SMS.getContentValuesFromBundle(bundle);
                 Uri smsUri = ctx.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
                 String address = values.getAsString(Constants.ADDRESS);
                 Contact contact = new Contact(ctx,address);
-                int threadId = Utils.getSmsThreadId(ctx,smsUri);
+                int threadId = Utils.getSmsThreadId(ctx, smsUri);
                 contact.setThreadId(threadId);
-                ConversationsListUpdater.updateConversation(threadId);
+
+                // TODO delete this ConversationsListUpdater.updateConversation(threadId);
                 SMS sms = new SMS(values);
-                NotificationManager mNotificationManager =
-                        (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-                // mId allows you to update the notification later on.
-                if(!sms.isRead()){
-                    mNotificationManager.notify(contact.getThreadId(), NotificationBuilder.buildSmsReceiveNotification(ctx,contact,sms));
+                Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + contact.getThreadId());
+                if(contact.getThreadId() !=  currentThreadId){
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                    // mId allows you to update the notification later on.
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
+                    boolean isSummary =  MyNotificationManager.buildSmsReceiveNotification(ctx, contact, sms, builder);
+                    //mNotificationManager.notify(MyNotificationManager.ID_SMS_RECEIVED,notif);
+                    int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : contact.getThreadId();
+                    mNotificationManager.notify(notif_id,builder.build());
+                }else {
+                    values = new ContentValues();
+                    values.put(Constants.MESSAGE.READ, 1); // is read
+                    // update message as read.
+                    ctx.getContentResolver().update(smsUri, values,null,null);
+                    // if user is on this chat , make no notification , just slight vibration
+                    Vibrator v = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
+                    v.vibrate(VIBRATE_LENGTH);
                 }
+
                 return null;
             }
         }.execute(ctx,intent.getExtras());

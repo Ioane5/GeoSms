@@ -8,16 +8,17 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 
-import com.ioane.sharvadze.geosms.Constants;
-import com.ioane.sharvadze.geosms.Utils;
+import utils.Constants;
+import utils.Utils;
 
-import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by Ioane on 2/21/2015.
  */
-public class Contact implements Serializable{
+public class Contact{
 
     private int id;
 
@@ -48,12 +49,12 @@ public class Contact implements Serializable{
             ContactsContract.CommonDataKinds.Phone.PHOTO_URI
     };
 
-    private static final String ID = "id";
-    private static final String THREAD_ID = "thread_id";
-    private static final String NAME = "name";
-    private static final String PHOTO = "photo";
-    private static final String PHOTO_URI = "photo_uri";
-    private static final String ADDRESS = "address";
+    public static final String ID = "id";
+    public static final String THREAD_ID = "thread_id";
+    public static final String NAME = "name";
+    public static final String PHOTO = "photo";
+    public static final String PHOTO_URI = "photo_uri";
+    public static final String ADDRESS = "address";
 
     public Contact(Bundle contactData){
         this.threadId = contactData.getInt(THREAD_ID);
@@ -62,6 +63,11 @@ public class Contact implements Serializable{
         this.photoUri =  contactData.getString(PHOTO_URI);
         this.address = contactData.getString(ADDRESS);
         this.photo = (Bitmap)contactData.getParcelable(PHOTO);
+    }
+
+    public Contact(Cursor c){
+
+        Log.i(TAG, Arrays.asList(c.getColumnNames()).toString());
     }
 
     public Bundle getBundle(){
@@ -95,20 +101,7 @@ public class Contact implements Serializable{
 
     public Contact(Context context,String address){
         initFromAddress(context,address);
-//        //  get id from address...
-//        Cursor c = context.getContentResolver().query(
-//                Uri.parse("content://mms-sms/canonical-addresses"), new String[]{"_id"},
-//                "address = ? ", new String[]{address}, null);
-//        if (c != null) {
-//            if (c.getCount() != 0) {
-//
-//                c.moveToNext();
-//                int id = c.getInt(c.getColumnIndex("_id"));
-//                Log.i(TAG,"ID IS " + id);
-//                setThreadId(id);
-//            }
-//            c.close();
-//        }
+        setThreadId(0);
     }
 
 
@@ -188,6 +181,26 @@ public class Contact implements Serializable{
 
     public void setPhoto(Bitmap photo) {
         this.photo = photo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Contact contact = (Contact) o;
+
+        if (id != contact.id) return false;
+        if (threadId != contact.threadId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + threadId;
+        return result;
     }
 
     @Override

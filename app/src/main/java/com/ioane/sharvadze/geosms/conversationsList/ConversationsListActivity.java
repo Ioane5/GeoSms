@@ -1,9 +1,9 @@
 package com.ioane.sharvadze.geosms.conversationsList;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -13,7 +13,6 @@ import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,14 +20,17 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.ioane.sharvadze.geosms.Constants;
-import com.ioane.sharvadze.geosms.MyActivity;
+import utils.Constants;
+import utils.MyActivity;
+import com.ioane.sharvadze.geosms.MyNotificationManager;
+import com.ioane.sharvadze.geosms.NewConversatonActivity;
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.Utils;
+import utils.Utils;
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.conversationsListFatchers.ConversationLoader;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,13 +75,17 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         listAdapter = new ConversationsListAdapter(getBaseContext(),
                 R.layout.conversation_item, new ArrayList<Conversation>());
 
-
         conversationList = (ListView) findViewById(R.id.conversations_list_view);
         conversationList.setAdapter(listAdapter);
         // Listen to clicks
         conversationList.setOnItemClickListener(this);
         // listen for conversation updates
         initMultiChoiceListView(conversationList);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.attachToListView(conversationList);
+
+        MyNotificationManager.clearNotifications(getBaseContext());
         LoaderManager lm = getLoaderManager();
         lm.initLoader(0, null, this);
     }
@@ -95,21 +101,26 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
             viewGroup.setVisibility(View.VISIBLE);
 
             // Set up a button that allows the user to change the default SMS app
-            Button button = (Button) findViewById(R.id.change_default_app);
-            button.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    Log.d(TAG, "clicked on button");
-                    Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
-                    intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
-                    startActivityForResult(intent, DEFAULT_SMS_REQUEST);
-                }
-            });
+            setUpDefaultAppResolver();
         } else {
             // App is the default.
             // Hide the "not currently set as the default SMS app" interface
             View viewGroup = findViewById(R.id.not_default_app);
             viewGroup.setVisibility(View.GONE);
         }
+    }
+
+    @TargetApi(19)
+    private void setUpDefaultAppResolver(){
+        Button button = (Button) findViewById(R.id.change_default_app);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.d(TAG, "clicked on button");
+                Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+                intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
+                startActivityForResult(intent, DEFAULT_SMS_REQUEST);
+            }
+        });
     }
 
     @Override
@@ -163,6 +174,10 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         //overridePendingTransition(R.animator.abc_slide_in_left, R.anim.abc_fade_out);
     }
 
+    public void newConversation(View view){
+        Intent i = new Intent(ConversationsListActivity.this, NewConversatonActivity.class);
+        startActivity(i);
+    }
 
     private void initMultiChoiceListView(ListView listView) {
         new ConversationsListCAB(getApplicationContext(), listView, listAdapter,

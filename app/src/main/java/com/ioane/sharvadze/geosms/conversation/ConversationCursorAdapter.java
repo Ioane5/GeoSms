@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.Utils;
+import utils.Utils;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
@@ -31,22 +31,26 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
     private Bitmap MY_IMAGE;
 
+    private int receivedMsgCol;
+
     public ConversationCursorAdapter(Context context, Cursor c, int flags,Contact contact) {
         super(context, c, flags);
         this.contact = contact;
         MY_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.no_image);
+                R.mipmap.ic_no_image);
         // make it circle like.
         MY_IMAGE = Utils.getCircleBitmap(MY_IMAGE);
+        this.receivedMsgCol = context.getResources().getColor(R.color.themeLight);
     }
 
-    public ConversationCursorAdapter(Context context, Cursor c, boolean autoRequery,Contact contact) {
+    public ConversationCursorAdapter(Context context, Cursor c, boolean autoRequery ,Contact contact) {
         super(context, c, autoRequery);
         this.contact = contact;
         MY_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.no_image);
+                R.mipmap.ic_no_image);
         // make it circle like.
         MY_IMAGE = Utils.getCircleBitmap(MY_IMAGE);
+        this.receivedMsgCol = context.getResources().getColor(R.color.themeLight);
     }
 
 
@@ -107,7 +111,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
                 holder.deliveryStatusView.setText("failed");
                 break;
             case RECEIVED:
-                view.setBackgroundColor(Color.parseColor("#1F44CC0A"));
+                view.setBackgroundColor(receivedMsgCol);
                 holder.nameView.setText(TextUtils.isEmpty(contact.getName())? contact.getAddress():contact.getName());
                 holder.photo.setImageBitmap(contact.getPhoto());
                 break;

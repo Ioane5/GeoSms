@@ -1,11 +1,11 @@
-package com.ioane.sharvadze.geosms;
+package utils;
 
 /**
  * Created by Ioane on 2/20/2015.
  */
 public interface Constants {
 
-    int IMAGE_SIZE = 60;
+    int IMAGE_SIZE = 90;
 
     String MAGTIFUN = "Magtifun";
     String GEOCELL = "GeoCell";
@@ -13,6 +13,7 @@ public interface Constants {
     String RECIPIENT_ID = "recipient_ids";
 
     String ID = "_id";
+
 
     String CONVERSATION_LAST_MESSAGE = "snippet";
 
@@ -23,6 +24,8 @@ public interface Constants {
     String DRAFTS_FILE = "drafts";
 
     String THREAD_ID = "thread_id";
+
+    String MSG_COUNT = "message_count";
 
     /**
      * For intent
@@ -37,6 +40,8 @@ public interface Constants {
         String MESSAGE_SENT = "sms_sent";
         String MESSAGE_DELIVERED_1= "android.provider.Telephony.SMS_RECEIVED";
         String MESSAGE_DELIVERED_2= "android.provider.Telephony.SMS_DELIVER";
+        String RECEIVED_NOTIFICATION_DISMISSED = "received_notification_dismissed";
+        String FAILED_NOTIFICATION_DISMISSED = "failed_notification_dismissed";
     }
 
     interface MESSAGE{

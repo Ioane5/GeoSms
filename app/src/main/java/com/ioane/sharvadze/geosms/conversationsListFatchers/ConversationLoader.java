@@ -4,15 +4,13 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 import android.util.SparseArray;
-import android.widget.CursorAdapter;
 
+import utils.Constants;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -42,6 +40,8 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
 
         Cursor c = getContext().getContentResolver().query(uri, null, null, null, "date desc");
         while (c.moveToNext()) {
+            int numMsg = c.getInt(c.getColumnIndex(Constants.MSG_COUNT));
+            if(numMsg <= 0) continue; // we don't need empty conversations
             Conversation conversation = new Conversation(getContext(), c,mContactCache);
             mConversations.add(conversation);
         }
@@ -147,7 +147,7 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
     }
 
     private void onReleaseResources(List<Conversation> conversations) {
-        if(mContactCache != null) mContactCache.clear();
+        //if(mContactCache != null) mContactCache.clear();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.ioane.sharvadze.geosms;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -59,10 +61,12 @@ public class SettingsActivity extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("enable_websms"));
-        bindPreferenceSummaryToValue(findPreference("websms_name"));
-        bindPreferenceSummaryToValue(findPreference("websms_username"));
-        bindPreferenceSummaryToValue(findPreference("websms_password"));
+        SharedPreferences preferences = MyPreferencesManager.getWebSmsPreferences(getBaseContext());
+
+        bindPreferenceSummaryToValue(preferences, findPreference("enable_websms"));
+        bindPreferenceSummaryToValue(preferences,findPreference("websms_name"));
+        bindPreferenceSummaryToValue(preferences,findPreference("websms_username"));
+        bindPreferenceSummaryToValue(preferences,findPreference("websms_password"));
     }
 
     /**
@@ -101,11 +105,12 @@ public class SettingsActivity extends PreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private  Preference.OnPreferenceChangeListener
+            sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
-
+            Log.i("stringValue",stringValue);
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
@@ -118,8 +123,10 @@ public class SettingsActivity extends PreferenceActivity {
                                 : null);
 
             }else if(preference instanceof EditTextPreference){
-                if(preference.getKey().equals("websms_password")){
-                    //((EditTextPreference) preference).setText("");
+                if(preference.getKey().equals("websms_password") ||
+                        preference.getKey().equals("websms_username")){
+                    //MyPreferencesManager.saveCookie(getBaseContext(),null);
+
                 }else {
                     preference.setSummary(((EditTextPreference) preference).getText());
                 }
@@ -146,7 +153,7 @@ public class SettingsActivity extends PreferenceActivity {
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private void bindPreferenceSummaryToValue(SharedPreferences preferences,Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
@@ -154,14 +161,10 @@ public class SettingsActivity extends PreferenceActivity {
         // current value.
         if(preference instanceof CheckBoxPreference)
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getBoolean(preference.getKey(), true));
+                    preferences.getBoolean(preference.getKey(), true));
         else{
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
+                    preferences.getString(preference.getKey(), ""));
         }
     }
 

@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import com.ioane.sharvadze.geosms.Constants;
-import com.ioane.sharvadze.geosms.Constants.MESSAGE;
+import utils.Constants;
+import utils.Constants.MESSAGE;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.ioane.sharvadze.geosms;
+package broadcastReceivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

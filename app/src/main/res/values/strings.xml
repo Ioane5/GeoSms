@@ -20,7 +20,11 @@
     <string name="delete_warning_msg_single">Delete this conversation?</string>
     <string name="delete_warning_msg_plural">Delete these conversations?</string>
     <string name="warning">Warning</string>
+    <string name="geosms_unread_sms">Unread Sms messages</string>
+    <string name="unread_sms_content_format" formatted="false"><b>(%d)</b>%s</string>
+    <string name="title_activity_settings_test">SettingsTestActivity</string>
 
-
+    <string name="websms_settings">WebSms</string>
+    <string name="title_activity_new_conversaton">Create New Conversation</string>
 
 </resources>

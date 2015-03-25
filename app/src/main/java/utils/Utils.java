@@ -1,4 +1,4 @@
-package com.ioane.sharvadze.geosms;
+package utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -64,22 +64,22 @@ public class Utils {
             // get image from filesystem
             InputStream input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
 
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-
-            BitmapFactory.decodeStream(input,null,options);
-
-            //Find the correct scale value. It should be the power of 2.
-            int scale=1;
-            while(options.outWidth/scale/2>=size && options.outHeight/scale/2>=size)
-                scale*=2;
-
-            //now we got how much we must reduce image quality.
-            options = new BitmapFactory.Options();
-            options.inSampleSize=scale;
-
-            input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
-            return BitmapFactory.decodeStream(input, null, options);
+//            BitmapFactory.Options options=new BitmapFactory.Options();
+//            options.inJustDecodeBounds = true;
+//
+//            BitmapFactory.decodeStream(input,null,options);
+//
+//            //Find the correct scale value. It should be the power of 2.
+//            int scale=1;
+//            while(options.outWidth/scale/2>=size && options.outHeight/scale/2>=size)
+//                scale*=2;
+//
+//            //now we got how much we must reduce image quality.
+//            options = new BitmapFactory.Options();
+//            options.inSampleSize=scale;
+//
+//            input = context.getContentResolver().openInputStream(Uri.parse(photoURI));
+            return Bitmap.createScaledBitmap(BitmapFactory.decodeStream(input, null, null),size,size,true);
         } catch (Exception e) {
             e.printStackTrace();
         }
