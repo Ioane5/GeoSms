@@ -25,8 +25,8 @@ public class MyPreferencesManager {
     private static String WEB_PREFS = "WEB_SMS_PREFS";
 
     public static SharedPreferences getWebSmsPreferences(Context ctx){
-        return (ctx).getSharedPreferences(WEB_PREFS,Context.MODE_PRIVATE);
-        //return PreferenceManager.getDefaultSharedPreferences(ctx);
+        //return (ctx.getApplicationContext()).getSharedPreferences(WEB_PREFS,Context.MODE_PRIVATE);
+        return PreferenceManager.getDefaultSharedPreferences(ctx.getApplicationContext());
     }
 
     public static WebSms getWebSmsManager(Context ctx){

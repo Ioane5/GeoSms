@@ -42,6 +42,7 @@ public class SmsDispatcher extends BroadcastReceiver {
 
     public static void updateThreadId(int threadId){
         currentThreadId = threadId;
+        Log.i(TAG,"update_threadId = "+threadId);
     }
 
     @Override

@@ -12,7 +12,8 @@
         android:entries="@array/pref_web_sms_client_list_titles"
         android:entryValues="@array/pref_web_sms_client_list_values"
         android:negativeButtonText="@null"
-        android:positiveButtonText="@null" />
+        android:positiveButtonText="@null"
+        />
 
     <EditTextPreference
         android:key="websms_username"

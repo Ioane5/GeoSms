@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.SettingsActivity;
+import com.ioane.sharvadze.geosms.SettingsTestActivity;
 
 /**
  * Created by Ioane on 3/5/2015.
@@ -37,7 +38,7 @@ public class MyActivity extends ActionBarActivity {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent i = new Intent(MyActivity.this,SettingsActivity.class);
+                Intent i = new Intent(MyActivity.this,SettingsTestActivity.class);
                 startActivity(i);
                 return true;
 //            case android.R.id.home:

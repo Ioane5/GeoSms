@@ -23,7 +23,7 @@ import android.widget.Toast;
 import utils.Constants;
 import utils.MyActivity;
 import com.ioane.sharvadze.geosms.MyNotificationManager;
-import com.ioane.sharvadze.geosms.NewConversatonActivity;
+import newConversation.NewConversatonActivity;
 import com.ioane.sharvadze.geosms.R;
 import utils.Utils;
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;

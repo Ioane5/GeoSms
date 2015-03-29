@@ -2,6 +2,7 @@ package com.ioane.sharvadze.geosms.websms;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.ioane.sharvadze.geosms.MyPreferencesManager;
@@ -94,21 +95,25 @@ public class SyncedWebSms implements WebSms , SharedPreferences.OnSharedPreferen
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.i(TAG,key);
-        if(MyPreferencesManager.WEBSMS_COOKIE.equals(key))
+        if(MyPreferencesManager.WEBSMS_COOKIE.equals(key) || key == null)
             return;
-        MyPreferencesManager.saveCookie(context,null);
+        // Web sms changed
+        if(MyPreferencesManager.WEBSMS_NAME.equals(key)){
+            MyPreferencesManager.saveCookie(context,null);
+            this.webSms = MyPreferencesManager.getWebSmsManager(context);
+            return;
+        }
         if(webSms == null) return;
 
-        webSms.setCookie(""); // clear cookie
-        if(key == null)
-            return;
-        if(MyPreferencesManager.WEBSMS_NAME.equals(key)){
-            this.webSms = MyPreferencesManager.getWebSmsManager(context);
-        }else if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
+        // changed username
+        if(MyPreferencesManager.WEBSMS_USERNAME.equals(key)){
+            MyPreferencesManager.saveCookie(context,null);
+            webSms.setCookie(""); // clear cookie
             this.webSms.setUserName(sharedPreferences.getString(MyPreferencesManager.WEBSMS_USERNAME,""));
-        }if(MyPreferencesManager.WEBSMS_PASSWORD.equals(key)){
+        }else if(MyPreferencesManager.WEBSMS_PASSWORD.equals(key)){
+            MyPreferencesManager.saveCookie(context,null);
+            webSms.setCookie(""); // clear cookie
             this.webSms.setPassword(sharedPreferences.getString(MyPreferencesManager.WEBSMS_PASSWORD, ""));
         }
     }
-
 }

@@ -119,10 +119,11 @@
         </activity>
         <activity
             android:name=".SettingsTestActivity"
-            android:label="@string/title_activity_settings_test" >
+            android:label="@string/title_activity_settings_test"
+            >
         </activity>
         <activity
-            android:name=".NewConversatonActivity"
+            android:name="newConversation.NewConversatonActivity"
             android:label="@string/title_activity_new_conversaton" >
         </activity>
     </application>

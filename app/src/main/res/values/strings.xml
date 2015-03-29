@@ -27,4 +27,9 @@
     <string name="websms_settings">WebSms</string>
     <string name="title_activity_new_conversaton">Create New Conversation</string>
 
+    <string name="sms_failed"><font fgcolor="red"><i>failed</i></font></string>
+    <string name="sms_pending"><font fgcolor="gray"><i>pending</i></font></string>
+    <string name="sms_draft"><font fgcolor="gray"><i>draft</i></font></string>
+
+
 </resources>
