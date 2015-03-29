@@ -26,58 +26,54 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:background="@drawable/oval_shape"
         >
 
         <ToggleButton
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+
             android:gravity="bottom"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:layout_marginLeft="7dp"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/web_toggle_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+
             android:textOff=""
             android:textOn=""
-            android:layout_weight="0.01"
+            android:background="@drawable/web_toggle_button"
             android:id="@+id/use_web_toggle_button"/>
 
         <EditText
-            android:background="#ffffffff"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:padding="5dp"
 
-            android:padding="10dp"
+            android:layout_weight="1"
 
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_gravity="center"
 
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
 
             android:scrollbars="vertical"
             android:inputType="textShortMessage|textMultiLine"
             android:singleLine="false"
             android:maxLines="5"
             android:hint="@string/edit_text_hint"
+            android:background="#ffffffff"
             android:id="@+id/enter_message_edit_text"
             />
 
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/send_button"
-            android:scaleType="fitCenter"
-            android:layout_marginRight="7dp"
-            android:layout_marginEnd="7dp"
+
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginLeft="7dp"
+            android:scaleType="fitCenter"
+
             android:clickable="true"
+            android:background="@drawable/send_button"
             android:id="@+id/send_button"
-            />
+            android:contentDescription="@string/send_button" />
 
         </LinearLayout>
 
@@ -85,6 +81,7 @@
         android:gravity="center"
         android:textSize="15sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+
         android:id="@+id/symbol_counter"/>
 </LinearLayout>

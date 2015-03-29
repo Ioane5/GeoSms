@@ -4,7 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_conversation">ConversationActivity</string>
-    <string name="edit_text_hint"><b>Enter a message here</b></string>
+    <string name="edit_text_hint">Enter a message here</string>
     <string name="main_title"><b>Geo SMS</b></string>
     <string name="set_default_app">Set as default SMS app</string>
     <string name="set_default_app_to_send"><i>To send, set as default SMS app</i></string>
@@ -30,6 +30,9 @@
     <string name="sms_failed"><font fgcolor="red"><i>failed</i></font></string>
     <string name="sms_pending"><font fgcolor="gray"><i>pending</i></font></string>
     <string name="sms_draft"><font fgcolor="gray"><i>draft</i></font></string>
+
+    <string name="send_button">Send Button</string>
+
 
 
 </resources>
