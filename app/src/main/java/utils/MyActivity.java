@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.SettingsActivity;
 import com.ioane.sharvadze.geosms.SettingsTestActivity;
 
 /**

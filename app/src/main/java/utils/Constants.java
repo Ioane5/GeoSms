@@ -35,6 +35,7 @@ public interface Constants {
     String CONTACT_BUNDLE = "CONTACT";
 
     int KITKAT_API_LEVEL = 19;
+    String TOGGLE_CHECKED = "toggle_checked";
 
     interface Actions{
         String MESSAGE_SENT = "sms_sent";

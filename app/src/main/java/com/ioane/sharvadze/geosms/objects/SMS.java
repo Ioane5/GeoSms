@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import java.util.Date;
+
 import utils.Constants;
 import utils.Constants.MESSAGE;
-
-import java.util.Date;
 
 /**
  * Created by Ioane on 2/21/2015.

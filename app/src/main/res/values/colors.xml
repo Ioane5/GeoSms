@@ -21,10 +21,18 @@
     <item name="theme_light_gray2" type="color">#ffe7e7e7</item>
     <item name="theme_gray_white" type="color">#fffafafa</item>
 
+    <item name="conversation_user_name" type="color">@color/theme_msg_color</item>
+    <item name="conversation_last_msg" type="color">@color/theme_msg_color</item>
+    <item name="conversation_date" type="color">#808080</item>
+
+
+
     <item name="theme_msg_color" type="color">#ff4e4e4e</item>
-    <item name="themePrimary" type="color">#FF8800</item>
-    <item name="themeAccent" type="color">#FFBB33</item>
-    <item name="themeLight" type="color">#fffff6e1</item>
+    <item name="themePrimary" type="color">#8BC34A</item>
+    <item name="themeAccent" type="color">#8BC34A</item>
+    <item name="themeLight" type="color">#C5E1A5</item>
+    <item name="conversations_list" type="color">@color/white</item>
+
 
 
     <integer-array name="androidcolors">

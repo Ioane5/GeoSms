@@ -6,12 +6,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.SparseArray;
 
-import utils.Constants;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import utils.Constants;
 
 /**
  * Created by Ioane on 3/12/2015.

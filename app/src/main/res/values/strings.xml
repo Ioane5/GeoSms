@@ -33,6 +33,7 @@
 
     <string name="send_button">Send Button</string>
 
-
+    <string name="favorites">Favorites</string>
+    <string name="all">All</string>
 
 </resources>

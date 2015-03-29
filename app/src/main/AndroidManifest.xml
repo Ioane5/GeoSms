@@ -123,7 +123,7 @@
             >
         </activity>
         <activity
-            android:name="newConversation.NewConversatonActivity"
+            android:name="newConversation.NewConversationActivity"
             android:label="@string/title_activity_new_conversaton" >
         </activity>
     </application>

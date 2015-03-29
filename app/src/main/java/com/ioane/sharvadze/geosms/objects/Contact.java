@@ -10,10 +10,10 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import java.util.Arrays;
+
 import utils.Constants;
 import utils.Utils;
-
-import java.util.Arrays;
 
 /**
  * Created by Ioane on 2/21/2015.

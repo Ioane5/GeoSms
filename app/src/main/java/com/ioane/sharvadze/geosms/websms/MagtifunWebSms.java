@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import utils.Constants;
 import com.ioane.sharvadze.geosms.MyPreferencesManager;
 
 import org.apache.http.Header;
@@ -25,6 +24,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import utils.Constants;
 
 /**
  * Created by Ioane on 3/5/2015.

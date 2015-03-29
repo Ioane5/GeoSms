@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.SparseArray;
 
-import utils.Constants;
-
 import java.util.Date;
+
+import utils.Constants;
 
 /**
  * Created by Ioane on 2/21/2015.

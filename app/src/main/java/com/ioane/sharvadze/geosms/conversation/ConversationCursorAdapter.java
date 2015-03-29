@@ -15,9 +15,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioane.sharvadze.geosms.R;
-import utils.Utils;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
+
+import utils.Utils;
 
 /**
  * Created by Ioane on 2/26/2015.
@@ -88,15 +89,31 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
         SMS.MsgType type = message.getMsgType();
 
-        holder.nameView.setText("me");
-        holder.photo.setImageBitmap(MY_IMAGE);
-        if (holder.deliveryStatusView.length() > 0) {
-            holder.deliveryStatusView.setText("");
+        SMS nextSms = null;
+        if(cursor.moveToPrevious()){
+            nextSms = new SMS(cursor);
         }
+
+        holder.nameView.setText(null);
+        holder.photo.setVisibility(View.INVISIBLE);
+
+        /*
+            if this sms is first , or is received from contact
+            let's show header. like photo and name...
+         */
+        if(type != SMS.MsgType.RECEIVED && (nextSms == null || nextSms.getMsgType() == SMS.MsgType.RECEIVED)){
+            holder.nameView.setText("me");
+            holder.photo.setImageBitmap(MY_IMAGE);
+            holder.photo.setVisibility(View.VISIBLE);
+            if (holder.deliveryStatusView.length() > 0) {
+                holder.deliveryStatusView.setText("");
+            }
+        }
+
+        view.setBackgroundColor(Color.TRANSPARENT);
 
         switch (type){
             case SENT:
-                view.setBackgroundColor(Color.WHITE);
                 break;
             case PENDING:
                 //view.setBackgroundColor(Color.BLUE);
@@ -112,14 +129,23 @@ public class ConversationCursorAdapter extends CursorAdapter {
                 break;
             case RECEIVED:
                 view.setBackgroundColor(receivedMsgCol);
-                holder.nameView.setText(TextUtils.isEmpty(contact.getName())? contact.getAddress():contact.getName());
-                holder.photo.setImageBitmap(contact.getPhoto());
-                break;
+                /*
+                    If this is sms from sender or is first, let's show header...
+                 */
+                if(nextSms == null || nextSms.getMsgType() != SMS.MsgType.RECEIVED){
+                    holder.nameView.setText(TextUtils.isEmpty(contact.getName())? contact.getAddress():contact.getName());
+                    holder.photo.setImageBitmap(contact.getPhoto());
+                    holder.photo.setVisibility(View.VISIBLE);
+
+                    break;
+                }
+
         }
 
         holder.messageView.setText(message.getText());
         CharSequence formattedTime = DateUtils.getRelativeTimeSpanString(message.getDate().getTime(),
-                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL);
         holder.timeView.setText(formattedTime);
+
     }
 }

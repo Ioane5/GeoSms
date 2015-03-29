@@ -22,17 +22,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import utils.Constants;
 import com.ioane.sharvadze.geosms.GeoSmsManager;
-import utils.MyActivity;
 import com.ioane.sharvadze.geosms.R;
-import broadcastReceivers.SmsDispatcher;
-import utils.Utils;
 import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
 import java.util.Date;
+
+import broadcastReceivers.SmsDispatcher;
+import utils.Constants;
+import utils.MyActivity;
+import utils.Utils;
 
 
 public class ConversationActivity extends MyActivity implements LoaderManager.LoaderCallbacks<Cursor> ,TextWatcher{
@@ -80,15 +81,18 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         if(!Utils.isDefaultSmsApp(this)){
             editText.setFocusable(false);
             editText.setHint(R.string.set_default_app_to_send);
+            webUseToggle.setEnabled(false);
+            button.setEnabled(false);
         }else {
-            SharedPreferences drafts = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
-            String text = drafts.getString(contact.getAddress(),null);
+            SharedPreferences prefs = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
+            String text = prefs.getString(contact.getAddress(),null);
             if(!TextUtils.isEmpty(text)) {
                 button.setEnabled(true);
                 editText.setText(text);
             }
+            boolean isChecked = prefs.getBoolean(Constants.TOGGLE_CHECKED,false);
+            webUseToggle.setChecked(isChecked);
         }
-        //markConversationAsRead(contact);
         startLoader();
     }
 

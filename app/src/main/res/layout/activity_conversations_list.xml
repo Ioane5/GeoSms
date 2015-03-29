@@ -4,6 +4,7 @@
 
     tools:context="com.ioane.sharvadze.geosms.conversationsList.ConversationsListActivity"
     android:orientation="vertical"
+    android:background="@color/conversations_list"
     >
 
 

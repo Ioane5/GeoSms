@@ -13,12 +13,13 @@ import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import utils.Constants;
 import com.ioane.sharvadze.geosms.MyNotificationManager;
-import utils.Utils;
 import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
+
+import utils.Constants;
+import utils.Utils;
 
 /**
  * Created by Ioane on 3/1/2015.

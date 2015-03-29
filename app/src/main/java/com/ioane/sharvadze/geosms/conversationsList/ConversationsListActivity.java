@@ -20,12 +20,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import utils.Constants;
-import utils.MyActivity;
 import com.ioane.sharvadze.geosms.MyNotificationManager;
-import newConversation.NewConversatonActivity;
 import com.ioane.sharvadze.geosms.R;
-import utils.Utils;
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.conversationsListFatchers.ConversationLoader;
 import com.ioane.sharvadze.geosms.objects.Contact;
@@ -34,6 +30,11 @@ import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import newConversation.NewConversationActivity;
+import utils.Constants;
+import utils.MyActivity;
+import utils.Utils;
 
 public class ConversationsListActivity extends MyActivity implements AdapterView.OnItemClickListener,
         LoaderManager.LoaderCallbacks<List<Conversation>> {
@@ -175,7 +176,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     }
 
     public void newConversation(View view){
-        Intent i = new Intent(ConversationsListActivity.this, NewConversatonActivity.class);
+        Intent i = new Intent(ConversationsListActivity.this, NewConversationActivity.class);
         startActivity(i);
     }
 
