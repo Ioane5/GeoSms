@@ -47,8 +47,6 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
     private ArrayAdapter<Conversation> listAdapter;
 
-    private static boolean onResume = false;
-
 
     /**
      * This means how many conversations to fetch at first time.
@@ -193,7 +191,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
             Log.i(TAG, "contact null");
             return;
         } else {
-            Intent intent = null;
+            Intent intent;
             if (TextUtils.isEmpty(contact.getName())) {
                 intent = new Intent(ContactsContract.Intents.SHOW_OR_CREATE_CONTACT, ContactsContract.Contacts.CONTENT_URI);
                 intent.setData(Uri.fromParts("tel", contact.getAddress(), null));
@@ -206,7 +204,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                 startActivity(intent);
             } else {
                 Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
-                ContactsContract.QuickContact.showQuickContact(this, (View) findViewById(R.id.quick_contact), uri,
+                ContactsContract.QuickContact.showQuickContact(this, findViewById(R.id.quick_contact), uri,
                         ContactsContract.QuickContact.MODE_MEDIUM, null);
             }
         }

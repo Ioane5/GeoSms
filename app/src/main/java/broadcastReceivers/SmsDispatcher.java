@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
@@ -22,6 +23,14 @@ import utils.Constants;
 import utils.Utils;
 
 /**
+ * Class SmsDispatcher that receives and handles
+ * various sms broadcasts.
+ *
+ * Some of them are :
+ *  * SMS_SENT
+ *  * SMS_RECEIVED and SMS_DELIVER
+ *  * SMS_FAILED
+ *
  * Created by Ioane on 3/1/2015.
  */
 public class SmsDispatcher extends BroadcastReceiver {
@@ -50,20 +59,30 @@ public class SmsDispatcher extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.i(TAG,"onReceive() :" + action);
+
         if(action == null) return;
+        // New versions only listen to SMS_DELIVER.
+        if(Build.VERSION.SDK_INT >= 19 && action.contains(Constants.Actions.SMS_RECEIVED)){
+            Log.i(TAG,"action dismissed " +action);
+            return;
+        }
 
-        switch (action){
-            case Constants.Actions.MESSAGE_SENT:
-                handleSmsSend(context,intent);
-                break;
 
-            case Constants.Actions.MESSAGE_DELIVERED_1:
-            case Constants.Actions.MESSAGE_DELIVERED_2:
-                handleSmsReceive(context,intent);
-                break;
+        if(action.equals( Constants.Actions.MESSAGE_SENT)){
+            handleSmsSend(context, intent);
 
-            default:
-                Log.w(TAG,"unknown action "+action);
+        }else if(action.contains(Constants.Actions.SMS_DELIVER) ||
+                action.contains(Constants.Actions.SMS_RECEIVED)){
+            handleSmsReceive(context, intent);
+        }else{
+            Log.w(TAG,"unknown action "+action);
+            // TODO REMOVE THIS!
+            NotificationManager mNotificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+            builder.setSubText(action);
+            mNotificationManager.notify(1212112, builder.build());
+            // TODO REMOVE
         }
 
     }
@@ -91,7 +110,7 @@ public class SmsDispatcher extends BroadcastReceiver {
                 // TODO delete this ConversationsListUpdater.updateConversation(threadId);
                 SMS sms = new SMS(values);
                 Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + contact.getThreadId());
-                if(contact.getThreadId() !=  currentThreadId){
+                if(contact.getThreadId() !=  currentThreadId || contact.getThreadId() == THREAD_ID_NONE){
                     NotificationManager mNotificationManager =
                             (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
                     // mId allows you to update the notification later on.

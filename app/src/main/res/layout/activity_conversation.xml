@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/conversation_horizontal_margin"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/conversation_horizontal_margin"
     android:paddingRight="@dimen/conversation_horizontal_margin"
     android:paddingTop="@dimen/conversation_vertical_margin"
     android:paddingBottom="@dimen/conversation_vertical_margin"
@@ -11,6 +12,8 @@
     >
 
     <ListView
+        android:scrollbarStyle="insideOverlay"
+
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -27,63 +30,74 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding="2dip"
-        android:orientation="horizontal"
-        android:background="@drawable/oval_shape"
-        >
+        android:layout_margin="2dp"
+        android:padding="1dip"
+        android:orientation="horizontal" >
 
         <ToggleButton
-            android:layout_height="50dp"
-            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:layout_width="35dp"
 
-            android:gravity="bottom"
+            android:layout_gravity="top"
 
             android:textOff=""
             android:textOn=""
             android:background="@drawable/web_toggle_button"
             android:id="@+id/use_web_toggle_button"/>
 
-        <EditText
+        <LinearLayout
+            android:layout_gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-
             android:layout_weight="1"
+            android:orientation="vertical">
 
-            android:layout_gravity="center"
+            <EditText
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
 
+                android:layout_marginTop="7dp"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                android:layout_gravity="center"
 
-            android:scrollbars="vertical"
-            android:inputType="textShortMessage|textMultiLine"
-            android:singleLine="false"
-            android:maxLines="5"
-            android:hint="@string/edit_text_hint"
-            android:background="#ffffffff"
-            android:id="@+id/enter_message_edit_text"
-            />
+                android:scrollbars="vertical"
+                android:inputType="textShortMessage|textMultiLine"
+                android:singleLine="false"
+                android:maxLines="5"
+                android:hint="@string/edit_text_hint"
+                android:textColorHint="@color/theme_grey"
+                android:background="#ffffffff"
+                android:imeOptions="flagNoExtractUi"
+                android:id="@+id/enter_message_edit_text"/>
+
+            <TextView
+                android:layout_gravity="end"
+                android:textSize="9sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/symbol_counter"/>
+        </LinearLayout>
 
         <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_gravity="top"
 
-            android:layout_marginTop="3dp"
+
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+
+            android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
+
+            android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
             android:scaleType="fitCenter"
-
             android:clickable="true"
             android:background="@drawable/send_button"
             android:id="@+id/send_button"
             android:contentDescription="@string/send_button" />
+    </LinearLayout>
 
-        </LinearLayout>
 
-    <TextView
-        android:gravity="center"
-        android:textSize="15sp"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
 
-        android:id="@+id/symbol_counter"/>
 </LinearLayout>

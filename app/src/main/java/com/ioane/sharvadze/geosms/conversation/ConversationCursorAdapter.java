@@ -97,17 +97,17 @@ public class ConversationCursorAdapter extends CursorAdapter {
         holder.nameView.setText(null);
         holder.photo.setVisibility(View.INVISIBLE);
 
+        if (holder.deliveryStatusView.length() > 0) {
+            holder.deliveryStatusView.setText("");
+        }
         /*
             if this sms is first , or is received from contact
             let's show header. like photo and name...
          */
         if(type != SMS.MsgType.RECEIVED && (nextSms == null || nextSms.getMsgType() == SMS.MsgType.RECEIVED)){
-            holder.nameView.setText("me");
+            holder.nameView.setText(R.string.me);
             holder.photo.setImageBitmap(MY_IMAGE);
             holder.photo.setVisibility(View.VISIBLE);
-            if (holder.deliveryStatusView.length() > 0) {
-                holder.deliveryStatusView.setText("");
-            }
         }
 
         view.setBackgroundColor(Color.TRANSPARENT);

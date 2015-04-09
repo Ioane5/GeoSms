@@ -37,14 +37,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/CustomActionBarTheme" >
+
         <receiver
             android:name="broadcastReceivers.SmsDispatcher"
-            android:permission="android.permission.BROADCAST_SMS" >
+            android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
+                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
                 <action android:name="sms_sent" />
             </intent-filter>
         </receiver>
+
 
         <!-- BroadcastReceiver that listens for Our Notifications -->
         <receiver android:name=".MyNotificationManager" >

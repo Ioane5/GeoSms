@@ -11,11 +11,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -44,12 +46,16 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private ConversationCursorAdapter adapter;
 
     private ToggleButton webUseToggle;
+    /** If user changed toggle, we set as true */
+    private boolean userChangedWebToggle = false;
 
     private ImageButton button;
 
     private TextView symbolCounter;
 
     private Contact contact;
+
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +66,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         button = (ImageButton)findViewById(R.id.send_button);
         button.setEnabled(false);
 
-        EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
+        final EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
         symbolCounter = (TextView)findViewById(R.id.symbol_counter);
         editText.addTextChangedListener(this);
 
@@ -75,7 +81,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         setTitle(TextUtils.isEmpty(contact.getName())? contact.getAddress(): contact.getName());
 
         adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contact);
-        ListView listView = (ListView)findViewById(R.id.conversation_list_view);
+        listView = (ListView)findViewById(R.id.conversation_list_view);
+
         listView.setAdapter(adapter);
 
         if(!Utils.isDefaultSmsApp(this)){
@@ -92,6 +99,12 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             }
             boolean isChecked = prefs.getBoolean(Constants.TOGGLE_CHECKED,false);
             webUseToggle.setChecked(isChecked);
+            webUseToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    userChangedWebToggle = !userChangedWebToggle;
+                }
+            });
         }
         startLoader();
     }
@@ -111,7 +124,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             @Override
             protected Void doInBackground(Void... params) {
                 // this part resolves thread id.
-                int thread_id = contact.getThreadId();
+                int thread_id;
                 String address = contact.getAddress();
                 ContentValues val = new ContentValues();
                 val.put(Constants.ADDRESS,address);
@@ -179,24 +192,23 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     }
 
     private Contact getContact(){
-        Bundle extras = getIntent().getExtras();
         try{
-            if(extras == null){
+            Bundle extras = getIntent().getExtras();
+            Bundle contactData;
+            if(extras != null && (contactData = extras.getBundle(Constants.CONTACT_BUNDLE)) != null){
+                return new Contact(contactData);
+            }else{
                 Uri uri = getIntent().getData();
-                if(uri == null) return null;
+                if(uri == null) {
+                    Log.w(TAG,"Contact data not provided!");
+                    return null;
+                }
                 String scheme = uri.getScheme();
                 String schemePart = uri.getSchemeSpecificPart();
                 if(scheme == null || schemePart == null) return null;
                 if(!scheme.contains("sms") && !scheme.contains("smsto")) return null;
 
                 return new Contact(getBaseContext(),schemePart);
-            }else {
-                Bundle contactData = extras.getBundle(Constants.CONTACT_BUNDLE);
-                if(contactData == null){
-                    Log.w(TAG,"contactData is not provided");
-                    return null;
-                }
-                return new Contact(contactData);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -230,7 +242,11 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         if(!editText.isFocusable()) return; // not save when it's not default
         SharedPreferences drafts = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
         SharedPreferences.Editor editor = drafts.edit();
-
+        /* if user changed web use toggle , let's save it ,
+          to not make user choose on every conversation start...*/
+        if(userChangedWebToggle){
+            editor.putBoolean(Constants.TOGGLE_CHECKED,webUseToggle.isChecked());
+        }
         if(editText.getText() == null || editText.getText().toString().equals("")){
             editor.remove(contact.getAddress());
         }else {
@@ -301,14 +317,45 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int pos = listView.getFirstVisiblePosition();
+        Log.i(TAG,"THIS SHIT BEFORE IS  = " + pos);
+
+        outState.putInt("scroll_pos",pos);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int pos = savedInstanceState.getInt("scroll_pos");
+        Log.i(TAG,"THIS SHIT IS  = " + pos);
+        if(pos != 0)
+            listView.smoothScrollToPositionFromTop(pos,0,0);
+    }
+
+    @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+
     }
 
     private static final int MESSAGE_DEFAULT_SIZE = 160;
+
+    private static final int MESSAGE_UNICODE_SIZE = 70;
+
+
+    boolean isASCII(String str){
+        for(int i=0;i<str.length();i++){
+            if(str.charAt(i) >= 128)
+                return false;
+        }
+        return true;
+    }
 
     @Override
     public void afterTextChanged(Editable s) {
@@ -318,10 +365,24 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             button.setEnabled(true);
 
         if(symbolCounter == null) return;
+        if(s == null){
+            symbolCounter.setText("");
+            return;
+        }
 
-        if( s != null && s.length()-5 > MESSAGE_DEFAULT_SIZE){
-            symbolCounter.setText(s.length()/MESSAGE_DEFAULT_SIZE+" "+
-                    s.length()%MESSAGE_DEFAULT_SIZE+"/"+MESSAGE_DEFAULT_SIZE);
+        int maxLen = MESSAGE_DEFAULT_SIZE;
+        if(!isASCII(s.toString()))
+            maxLen = MESSAGE_UNICODE_SIZE;
+
+        if(s.length() > maxLen/2){
+            symbolCounter.setVisibility(View.VISIBLE);
+            String str;
+            if(s.length()/maxLen == 0){
+                str = String.format("%d/%d",s.length()%maxLen,maxLen);
+            }else{
+                str = String.format("%d/%d (%d)",s.length()%maxLen,maxLen,s.length()/maxLen);
+            }
+            symbolCounter.setText(str);
         }else{
             symbolCounter.setText("");
         }
