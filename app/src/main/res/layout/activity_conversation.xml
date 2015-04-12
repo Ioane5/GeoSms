@@ -9,6 +9,7 @@
     android:orientation="vertical"
     android:focusableInTouchMode="true"
     android:background="@color/conversations_list"
+    android:id="@+id/conversation_activity"
     >
 
     <ListView
@@ -69,6 +70,7 @@
                 android:textColorHint="@color/theme_grey"
                 android:background="#ffffffff"
                 android:imeOptions="flagNoExtractUi"
+                android:focusableInTouchMode="true"
                 android:id="@+id/enter_message_edit_text"/>
 
             <TextView

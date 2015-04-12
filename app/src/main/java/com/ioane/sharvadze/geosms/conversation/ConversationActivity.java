@@ -12,11 +12,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.MotionEventCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,7 +36,6 @@ import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
 import java.util.Date;
-
 import broadcastReceivers.SmsDispatcher;
 import utils.Constants;
 import utils.MyActivity;
@@ -40,21 +44,17 @@ import utils.Utils;
 
 public class ConversationActivity extends MyActivity implements LoaderManager.LoaderCallbacks<Cursor> ,TextWatcher{
 
-
     private static final String TAG = ConversationActivity.class.getSimpleName();
 
     private ConversationCursorAdapter adapter;
-
     private ToggleButton webUseToggle;
     /** If user changed toggle, we set as true */
+
+    private static boolean isKeyboardVisible = false;
     private boolean userChangedWebToggle = false;
-
     private ImageButton button;
-
     private TextView symbolCounter;
-
     private Contact contact;
-
     private ListView listView;
 
     @Override
@@ -82,8 +82,18 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
         adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contact);
         listView = (ListView)findViewById(R.id.conversation_list_view);
-
         listView.setAdapter(adapter);
+        //listView.setOnScrollListener(new ListViewKeyboardGestureShow(getBaseContext(),editText));
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                    if(isKeyboardVisible)
+                        imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
+                return false;
+            }
+        });
 
         if(!Utils.isDefaultSmsApp(this)){
             editText.setFocusable(false);
@@ -106,6 +116,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 }
             });
         }
+        initKeyboardListener();
         startLoader();
     }
 
@@ -347,6 +358,52 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private static final int MESSAGE_DEFAULT_SIZE = 160;
 
     private static final int MESSAGE_UNICODE_SIZE = 70;
+
+
+    /**
+     * StackOverflow community answer.
+     */
+    private void initKeyboardListener(){
+        final View activityRootView = findViewById(R.id.conversation_activity);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                double ratio =  ((double)activityRootView.getHeight())/activityRootView.getRootView().getHeight();
+                // if more than 100 pixels, its probably a keyboard...
+                isKeyboardVisible = ratio < 0.75;
+            }
+        });
+    }
+
+    /**
+     * Static class ListViewKeyboardGestureShow
+     * ------------------------------------------
+     * This class :
+     *  * hides soft keyboard when user scrolls.
+     *
+     * It's common good practice to make such a gesture
+     * pleasure for user.
+     */
+    private static class ListViewKeyboardGestureShow implements  AbsListView.OnScrollListener {
+        private EditText editText;
+        private InputMethodManager imm;
+
+        public ListViewKeyboardGestureShow(Context context,EditText editText){
+            this.editText = editText;
+            imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        }
+
+        @Override
+        public void onScrollStateChanged(final AbsListView view, int scrollState) {
+            if(isKeyboardVisible)
+                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        }
+
+    }
 
 
     boolean isASCII(String str){
