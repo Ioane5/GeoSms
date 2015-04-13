@@ -9,6 +9,7 @@ import com.ioane.sharvadze.geosms.websms.MagtifunWebSms;
 import com.ioane.sharvadze.geosms.websms.WebSms;
 
 /**
+ * Class MyPreferenceManager
  * Created by Ioane on 3/5/2015.
  */
 public class MyPreferencesManager {

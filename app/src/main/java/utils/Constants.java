@@ -1,6 +1,9 @@
 package utils;
 
 /**
+ * Interface Constants that defines constants
+ * used in application.
+ *
  * Created by Ioane on 2/20/2015.
  */
 public interface Constants {

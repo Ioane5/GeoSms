@@ -40,10 +40,6 @@ public class MyActivity extends ActionBarActivity {
                 Intent i = new Intent(MyActivity.this,SettingsTestActivity.class);
                 startActivity(i);
                 return true;
-//            case android.R.id.home:
-//                finish();
-//                overridePendingTransition(R.animator.abc_slide_out_left, R.anim.abc_fade_out);
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

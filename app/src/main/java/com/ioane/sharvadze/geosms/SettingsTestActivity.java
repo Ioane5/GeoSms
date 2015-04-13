@@ -2,12 +2,15 @@ package com.ioane.sharvadze.geosms;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
+
+import java.util.Map;
 
 
 public class SettingsTestActivity extends ActionBarActivity {
@@ -52,19 +55,26 @@ public class SettingsTestActivity extends ActionBarActivity {
                     registerOnSharedPreferenceChangeListener(this);
 
             getPreferenceManager().setSharedPreferencesMode(MODE_PRIVATE);
+            SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
 
-            PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext())
-                    .registerOnSharedPreferenceChangeListener(this);
+            onSharedPreferenceChanged(preferences,MyPreferencesManager.WEBSMS_USERNAME);
+            onSharedPreferenceChanged(preferences,MyPreferencesManager.WEBSMS_NAME);
         }
 
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Log.i(TAG,key);
+            Preference pref = findPreference(key);
 
-            if (key.equals("username")) {
-                Preference pref = findPreference(key);
+            if (key.equals(MyPreferencesManager.WEBSMS_USERNAME)) {
                 pref.setSummary(sharedPreferences.getString(key, ""));
+            }else if(key.equals(MyPreferencesManager.WEBSMS_NAME)){
+                ListPreference listPreference = (ListPreference)pref;
+                int index = listPreference.findIndexOfValue(sharedPreferences.getString(key,"-1"));
+
+                pref.setSummary(index >= 0
+                        ? listPreference.getEntries()[index]
+                        : null);
             }
         }
     }
