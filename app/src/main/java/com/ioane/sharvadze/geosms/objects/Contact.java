@@ -10,15 +10,17 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import utils.Constants;
 import utils.Utils;
 
 /**
+ * Class Contact
  * Created by Ioane on 2/21/2015.
  */
-public class Contact{
+public class Contact implements Serializable{
 
     private int id;
 
@@ -29,8 +31,10 @@ public class Contact{
     private String photoUri;
 
     private String address;
-
-    private Bitmap photo;
+    /**
+     * We don't want to serialize it. :) because we can't serialize it.
+      */
+    private transient Bitmap photo;
 
 
     private static final String TAG = Contact.class.getSimpleName();
@@ -187,12 +191,11 @@ public class Contact{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Contact contact = (Contact) o;
 
         if (id != contact.id) return false;
         if (threadId != contact.threadId) return false;
-
+        if (address != null && !address.equals(contact.getAddress())) return false;
         return true;
     }
 

@@ -13,6 +13,7 @@ import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -208,6 +209,13 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                         ContactsContract.QuickContact.MODE_MEDIUM, null);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_conversation_list, menu);
+        return true;
     }
 
 }

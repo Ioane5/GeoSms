@@ -2,25 +2,17 @@ package utils;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.SettingsTestActivity;
+import com.ioane.sharvadze.geosms.SettingsActivity;
 
 /**
  * Created by Ioane on 3/5/2015.
  */
-public class MyActivity extends ActionBarActivity {
+public abstract class MyActivity extends ActionBarActivity {
 
     private static final String TAG = MyActivity.class.getSimpleName();
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_conversation, menu);
-        return true;
-    }
 
     @Override
     public void onBackPressed() {
@@ -37,11 +29,11 @@ public class MyActivity extends ActionBarActivity {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent i = new Intent(MyActivity.this,SettingsTestActivity.class);
+                Intent i = new Intent(MyActivity.this,SettingsActivity.class);
                 startActivity(i);
                 return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return false;
         }
 
     }

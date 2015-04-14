@@ -37,6 +37,8 @@
     <string name="all">All</string>
 
     <string name="me">me</string>
+    <string name="action_call">Call</string>
+    <string name="To">To...</string>
 
 
 </resources>

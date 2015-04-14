@@ -1,105 +1,54 @@
 package newConversation;
 
+
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.CursorAdapter;
+import android.widget.FilterQueryProvider;
 
 import com.ioane.sharvadze.geosms.R;
+import com.tokenautocomplete.TokenCompleteTextView;
+
+import utils.Constants;
+
+public class NewConversationActivity extends ActionBarActivity{
 
 
-public class NewConversationActivity extends ActionBarActivity {
-
-
-    private ViewPager viewPager;
-    private TabsPagerAdapter pagerAdapter;
+    @SuppressWarnings("unused")
     private static final String TAG = NewConversationActivity.class.getSimpleName();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_conversaton);
-        viewPager = (ViewPager)findViewById(R.id.pager);
 
+        CursorAdapter adapter = new ContactsCursorAdapter(this, null, 0);
 
-        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(pagerAdapter);
-
-    }
-
-    private class TabsPagerAdapter extends FragmentPagerAdapter{
-
-        public TabsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0: return new FavoriteContactsFragment();
-                case 1: return new AllContactsFragment();
-                default: return null;
+        adapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                Uri uri = constraint != null ?
+                        Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI, constraint.toString()) :
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_FILTER_URI;
+                // TODO add here custom number row before first cursor...
+                return getContentResolver().query(
+                        uri, Constants.contacts_projection, null, null,
+                        ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY);
             }
-        }
+        });
 
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            final CharSequence first = getResources().getString(R.string.favorites);
-            final CharSequence second = getResources().getString(R.string.all);
-
-            switch (position){
-                case 0: return first;
-                case 1: return second;
-                default: return null;
-            }
-        }
+        ContactsCompletionView completionView = (ContactsCompletionView) findViewById(R.id.searchView);
+        completionView.setAdapter(adapter);
+        completionView.allowDuplicates(false);
+        // TODO selected mode here
+        completionView.setTokenClickStyle(TokenCompleteTextView.TokenClickStyle.Delete);
+        completionView.setClickable(true);
     }
 
 
-    public static class FavoriteContactsFragment extends Fragment{
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater,
-                                 ViewGroup container, Bundle savedInstanceState) {
-            // The last two arguments ensure LayoutParams are inflated
-            // properly.
-            return inflater.inflate(
-                    R.layout.fragment_favorite_contacts, container, false);
-        }
-    }
-
-
-    public static class AllContactsFragment extends Fragment{
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater,
-                                 ViewGroup container, Bundle savedInstanceState) {
-            // The last two arguments ensure LayoutParams are inflated
-            // properly.
-            Log.i(TAG, "here onCreateView");
-            return inflater.inflate(
-                    R.layout.fragment_favorite_contacts, container, false);
-        }
-    }
 
 
 }

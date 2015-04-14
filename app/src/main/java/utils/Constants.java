@@ -1,5 +1,7 @@
 package utils;
 
+import android.provider.ContactsContract;
+
 /**
  * Interface Constants that defines constants
  * used in application.
@@ -39,6 +41,14 @@ public interface Constants {
 
     int KITKAT_API_LEVEL = 19;
     String TOGGLE_CHECKED = "toggle_checked";
+
+
+    String[] contacts_projection = new String[]{
+            ContactsContract.CommonDataKinds.Phone._ID,
+            ContactsContract.CommonDataKinds.Phone.NUMBER,
+            ContactsContract.CommonDataKinds.Phone.TYPE,
+            ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
 
     interface Actions{
         String MESSAGE_SENT = "sms_sent";
