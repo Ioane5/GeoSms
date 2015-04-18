@@ -6,19 +6,20 @@
     android:orientation="vertical">
 
     <newConversation.ContactsCompletionView
-        android:layout_margin="2dp"
+        android:layout_margin="0dp"
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="3"
-        android:hint="@string/To"
         android:background="@drawable/contacts_completion_view"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:padding="10dp"
-        android:textSize="20sp"
+        android:padding="5dp"
+        android:textSize="18sp"
         />
 
-
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/contacts_list"/>
 
 </LinearLayout>

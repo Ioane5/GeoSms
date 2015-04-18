@@ -60,6 +60,7 @@ public class SmsDispatcher extends BroadcastReceiver {
         String action = intent.getAction();
         Log.i(TAG,"onReceive() :" + action);
 
+
         if(action == null) return;
         // New versions only listen to SMS_DELIVER.
         if(Build.VERSION.SDK_INT >= 19 && action.contains(Constants.Actions.SMS_RECEIVED)){
@@ -88,7 +89,8 @@ public class SmsDispatcher extends BroadcastReceiver {
     }
 
     private void handleSmsReceive(Context ctx,Intent intent){
-        if(intent.getExtras() == null){
+        Bundle bundle = intent.getExtras();
+        if(bundle == null){
             Log.w(TAG,"bundle is empty");
             return;
         }
@@ -100,6 +102,8 @@ public class SmsDispatcher extends BroadcastReceiver {
                 Bundle bundle = (Bundle)params[1];
 
                 ContentValues values = SMS.getContentValuesFromBundle(bundle);
+                if(values == null)
+                    return null;
                 Uri smsUri = ctx.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
                 String address = values.getAsString(Constants.ADDRESS);
@@ -131,7 +135,7 @@ public class SmsDispatcher extends BroadcastReceiver {
 
                 return null;
             }
-        }.execute(ctx,intent.getExtras());
+        }.execute(ctx,bundle);
     }
 
 

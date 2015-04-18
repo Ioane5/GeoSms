@@ -5,11 +5,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AlphabetIndexer;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
@@ -144,7 +144,7 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
                 String photoUri = (String)params[1];
                 Context ctx = (Context)params[2];
                 position = (Integer)params[3];
-                return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri, ctx, 40));
+                return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri, ctx, 80));
             }
 
             @Override

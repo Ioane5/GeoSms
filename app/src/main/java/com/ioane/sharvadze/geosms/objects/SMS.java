@@ -171,15 +171,18 @@ public class SMS {
 
 
     public static ContentValues getContentValuesFromBundle(Bundle bundle){
+        ContentValues cv = new ContentValues();
+
         Object[] pdus = (Object[]) bundle.get("pdus");
+        if(pdus == null || pdus.length <= 0)
+            return null;
         SmsMessage[] msgs = new SmsMessage[pdus.length];
         StringBuilder messageText = new StringBuilder();
-        for (int i=0; i<msgs.length; i++){
+        for (int i=0; i<pdus.length; i++){
             msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-            messageText.append( msgs[i].getMessageBody().toString());
+            messageText.append(msgs[i].getMessageBody());
         }
         msgs[0].getUserData();
-        ContentValues cv = new ContentValues();
 
         cv.put(Constants.ADDRESS,msgs[0].getOriginatingAddress());
         cv.put(MESSAGE.BODY,messageText.toString());
