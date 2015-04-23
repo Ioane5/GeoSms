@@ -1,6 +1,8 @@
 package com.ioane.sharvadze.geosms.conversationsList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -16,16 +18,21 @@ import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.List;
 
+import utils.Utils;
+
 /**
+ * Class ConversationsListAdapter
+ * custom list adapter
+ *
  * Created by Ioane on 2/23/2015.
  */
 public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
 
-
+    @SuppressWarnings("unused")
     private final String TAG = ConversationsListAdapter.class.getSimpleName();
 
 
-    //private static Bitmap DEFAULT_IMAGE;
+    private Bitmap DEFAULT_IMAGE;
 
     private class ViewHolder {
         TextView contactNameView;
@@ -37,10 +44,10 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
     public ConversationsListAdapter(Context context, int resource, List<Conversation> objects) {
         super(context, resource, objects);
 
-//        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-//                R.mipmap.no_image);
-//        // make it circle like.
-//        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
+        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
+                R.mipmap.ic_no_image);
+        // make it circle like.
+        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
     }
 
     @Override
@@ -66,7 +73,7 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
 
 
         // not to show different values if contact is null...
-        holder.contactImageView.setImageBitmap(null);
+        holder.contactImageView.setImageBitmap(DEFAULT_IMAGE);
         holder.messageView.setText("");
 
         Contact contact = conversation.getContact();

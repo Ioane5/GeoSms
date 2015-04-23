@@ -21,6 +21,9 @@ import com.ioane.sharvadze.geosms.objects.SMS;
 import utils.Utils;
 
 /**
+ * Class ConversationCursorAdapter
+ * (custom cursor adapter)
+ *
  * Created by Ioane on 2/26/2015.
  */
 public class ConversationCursorAdapter extends CursorAdapter {

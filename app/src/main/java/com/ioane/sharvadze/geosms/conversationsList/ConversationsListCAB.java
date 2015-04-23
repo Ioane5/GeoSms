@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class ConversationsListCAB
+ *
  * Created by Ioane on 3/10/2015.
  */
 public class ConversationsListCAB {

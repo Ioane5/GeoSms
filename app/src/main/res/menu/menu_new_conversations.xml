@@ -11,4 +11,5 @@
         yourapp:showAsAction="always"
         yourapp:actionViewClass="android.support.v7.widget.SearchView" />
 
+
 </menu>

@@ -13,14 +13,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/quick_contact"/>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/not_default_app"
+        android:layout_gravity="center_horizontal|bottom"
         >
 
         <Button
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:background="@color/themePrimary"
             android:text="@string/set_default_app"
@@ -31,7 +33,6 @@
             />
 
     </LinearLayout>
-
 
 
     <FrameLayout
@@ -63,6 +64,8 @@
             fab:fab_colorNormal="@color/themePrimary"
             fab:fab_colorPressed="@color/themeLight"
             fab:fab_colorRipple="@color/themeAccent" />
+
+
 
     </FrameLayout>
 

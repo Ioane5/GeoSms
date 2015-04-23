@@ -3,6 +3,7 @@ package newConversation;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v4.widget.CursorAdapter;
@@ -32,8 +33,15 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     private AlphabetIndexer indexer;
 
+    private Bitmap DEFAULT_IMAGE;
+
     public ContactsCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
+                R.mipmap.ic_no_image);
+        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
+
+        indexer = new AlphabetIndexer(null, 0 , " ABCDEFGHIJKLMNOPQRTSUVWXYZ0123456789");
     }
 
 
@@ -47,10 +55,11 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        if(indexer == null){
+        if(newCursor != null && !newCursor.isClosed()){
+
             indexer = new AlphabetIndexer(newCursor,
                     newCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME),
-                    "ABCDEFGHIJKLMNOPQRTSUVWXYZ0123456789");
+                    " ABCDEFGHIJKLMNOPQRTSUVWXYZ0123456789");
         }else{
             indexer.setCursor(newCursor);
         }
@@ -118,7 +127,7 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         if(photoUri != null){
             setImage(holder.contactPhotoView,photoUri,context,cursor.getPosition());
         }else
-            holder.contactPhotoView.setImageBitmap(null);
+            holder.contactPhotoView.setImageBitmap(DEFAULT_IMAGE);
 
 
     }

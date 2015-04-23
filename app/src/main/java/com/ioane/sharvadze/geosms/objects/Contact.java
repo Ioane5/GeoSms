@@ -199,12 +199,7 @@ public class Contact implements Serializable{
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + threadId;
-        return result;
-    }
+
 
     @Override
     public String toString() {

@@ -1,51 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
     android:background="@drawable/selected_conversation"
+    android:padding="12dp"
     >
 
     <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
+        android:contentDescription="@string/main_title"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="2dp"
         android:drawingCacheQuality="low"
-        android:background="@mipmap/ic_no_image"
         android:id="@+id/contact_picture_image_view"
         android:onClick="onContactImageClick"/>
 
-    <View
-        android:layout_width="7dp"
-        android:layout_height="match_parent"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
-                android:textAllCaps="true"
-                android:textSize="20sp"
+                android:gravity="top"
+                android:layout_gravity="top"
+                android:textSize="18sp"
                 android:id="@+id/contact_name_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/conversation_user_name"
                 />
+
             <View
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                />
-
+                android:layout_weight="1" />
             <TextView
                 android:textAllCaps="true"
                 android:textSize="10sp"
@@ -64,9 +62,9 @@
             android:textColor="@color/conversation_last_msg"
             android:textStyle="italic"
             android:id="@+id/last_message_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            android:maxLines="4"
             android:ellipsize="end"
             android:gravity="bottom"
             />

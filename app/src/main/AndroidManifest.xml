@@ -115,7 +115,11 @@
 
         <activity
             android:name="newConversation.NewConversationActivity"
-            android:label="@string/title_activity_new_conversaton" >
+            android:parentActivityName=".conversationsList.ConversationsListActivity"
+            android:label="@string/title_activity_new_conversation" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".conversationsList.ConversationsListActivity" />
         </activity>
     </application>
 
