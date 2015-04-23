@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.util.Pair;
 
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.conversationsList.ConversationsListActivity;
@@ -24,6 +25,8 @@ import utils.Constants;
 import utils.Utils;
 
 /**
+ * Class managing Notifications.
+ *
  * Created by Ioane on 3/4/2015.
  */
 public class MyNotificationManager extends BroadcastReceiver{
@@ -36,8 +39,8 @@ public class MyNotificationManager extends BroadcastReceiver{
 
     public static final int ID_SMS_RECEIVED = 1231321;
 
-
-    private static HashMap<Contact,Integer> receivedMessages =  new HashMap<Contact,Integer>();
+    // TODO THIS SHOULDN'T BE STATIC
+    private static HashMap<Pair<String,String>,Integer> receivedMessages =  new HashMap<>();
 
     public static void buildSmsReceiveUsualNotif(Context ctx,Contact contact,SMS sms,NotificationCompat.Builder mBuilder){
         Bitmap photo;
@@ -82,9 +85,9 @@ public class MyNotificationManager extends BroadcastReceiver{
 
         StringBuilder contentText = new StringBuilder();
         CharSequence format = ctx.getText(R.string.unread_sms_content_format);
-        for(Contact contact: receivedMessages.keySet()){
+        for(Pair<String,String> contact: receivedMessages.keySet()){
             int numReceived = receivedMessages.get(contact);
-            String name = contact.getName() == null?contact.getAddress():contact.getName();
+            String name = contact.first != null ? contact.first : contact.second;
             contentText.append(String.format(format.toString(), numReceived, name));
         }
 
@@ -130,10 +133,11 @@ public class MyNotificationManager extends BroadcastReceiver{
      */
     public static boolean buildSmsReceiveNotification(Context ctx,Contact contact,SMS sms,NotificationCompat.Builder mBuilder){
         // one more notification will be seen
-        if(receivedMessages.containsKey(contact)){
-            receivedMessages.put(contact,receivedMessages.get(contact)+1);
+        Pair<String,String> contactInfo = new Pair<>(contact.getName(),contact.getAddress());
+        if(receivedMessages.containsKey(contactInfo)){
+            receivedMessages.put(contactInfo, receivedMessages.get(contactInfo)+1);
         }else {
-            receivedMessages.put(contact,1);
+            receivedMessages.put(contactInfo, 1);
         }
 
         if(receivedMessages.size() > 1){
@@ -173,7 +177,7 @@ public class MyNotificationManager extends BroadcastReceiver{
                 receivedMessages.clear();
             }else{
                 Contact contact = new Contact(intent.getBundleExtra(Constants.CONTACT_BUNDLE));
-                receivedMessages.remove(contact);
+                receivedMessages.remove(new Pair<>(contact.getName(),contact.getAddress()));
             }
         }else if(action.equals(Constants.Actions.FAILED_NOTIFICATION_DISMISSED)){
             // TODO add failed notification

@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -77,13 +76,12 @@ public class SmsDispatcher extends BroadcastReceiver {
             handleSmsReceive(context, intent);
         }else{
             Log.w(TAG,"unknown action "+action);
-            // TODO REMOVE THIS!
+
             NotificationManager mNotificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
             builder.setSubText(action);
             mNotificationManager.notify(1212112, builder.build());
-            // TODO REMOVE
         }
 
     }
@@ -95,47 +93,37 @@ public class SmsDispatcher extends BroadcastReceiver {
             return;
         }
         Log.i(TAG,"sms received");
-        new AsyncTask<Object,Void,Void>(){
-            @Override
-            protected Void doInBackground(Object... params) {
-                Context ctx = (Context)params[0];
-                Bundle bundle = (Bundle)params[1];
 
-                ContentValues values = SMS.getContentValuesFromBundle(bundle);
-                if(values == null)
-                    return null;
-                Uri smsUri = ctx.getContentResolver().insert(Uri.parse("content://sms/"), values);
+        ContentValues values = SMS.getContentValuesFromBundle(bundle);
+        if(values == null)
+            return;
+        Uri smsUri = ctx.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
-                String address = values.getAsString(Constants.ADDRESS);
-                Contact contact = new Contact(ctx,address);
-                int threadId = Utils.getSmsThreadId(ctx, smsUri);
-                contact.setThreadId(threadId);
+        String address = values.getAsString(Constants.ADDRESS);
+        Contact contact = new Contact(ctx,address);
+        int threadId = Utils.getSmsThreadId(ctx, smsUri);
+        contact.setThreadId(threadId);
 
-                // TODO delete this ConversationsListUpdater.updateConversation(threadId);
-                SMS sms = new SMS(values);
-                Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + contact.getThreadId());
-                if(contact.getThreadId() !=  currentThreadId || contact.getThreadId() == THREAD_ID_NONE){
-                    NotificationManager mNotificationManager =
-                            (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-                    // mId allows you to update the notification later on.
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
-                    boolean isSummary =  MyNotificationManager.buildSmsReceiveNotification(ctx, contact, sms, builder);
-                    //mNotificationManager.notify(MyNotificationManager.ID_SMS_RECEIVED,notif);
-                    int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : contact.getThreadId();
-                    mNotificationManager.notify(notif_id,builder.build());
-                }else {
-                    values = new ContentValues();
-                    values.put(Constants.MESSAGE.READ, 1); // is read
-                    // update message as read.
-                    ctx.getContentResolver().update(smsUri, values,null,null);
-                    // if user is on this chat , make no notification , just slight vibration
-                    Vibrator v = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
-                    v.vibrate(VIBRATE_LENGTH);
-                }
-
-                return null;
-            }
-        }.execute(ctx,bundle);
+        SMS sms = new SMS(values);
+        Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + contact.getThreadId());
+        if(contact.getThreadId() !=  currentThreadId || contact.getThreadId() == THREAD_ID_NONE){
+            NotificationManager mNotificationManager =
+                    (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+            // mId allows you to update the notification later on.
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
+            boolean isSummary =  MyNotificationManager.buildSmsReceiveNotification(ctx, contact, sms, builder);
+            //mNotificationManager.notify(MyNotificationManager.ID_SMS_RECEIVED,notif);
+            int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : contact.getThreadId();
+            mNotificationManager.notify(notif_id,builder.build());
+        }else {
+            values = new ContentValues();
+            values.put(Constants.MESSAGE.READ, 1); // is read
+            // update message as read.
+            ctx.getContentResolver().update(smsUri, values,null,null);
+            // if user is on this chat , make no notification , just slight vibration
+            Vibrator v = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(VIBRATE_LENGTH);
+        }
     }
 
 
@@ -147,34 +135,26 @@ public class SmsDispatcher extends BroadcastReceiver {
         }
         Log.i(TAG,pendingSmsUri.toString());
 
-        new AsyncTask<Object,Void,Void>(){
-            @Override
-            protected Void doInBackground(Object... params) {
-                Context ctx = (Context)params[0];
-                Uri pendingSmsUri = (Uri)params[1];
-                ContentValues values = new ContentValues();
+        ContentValues values = new ContentValues();
 
-                int threadId = intent.getIntExtra(Constants.RECIPIENT_ID,0);
-                if(threadId != 0)
-                    ConversationsListUpdater.updateConversation(threadId);
+        int threadId = intent.getIntExtra(Constants.RECIPIENT_ID,0);
+        if(threadId != 0)
+            ConversationsListUpdater.updateConversation(threadId);
 
-                switch (getResultCode()){
-                    case Activity.RESULT_OK:
-                        Log.d(TAG, "SMS sent");
-                        values.put(Constants.MESSAGE.TYPE,Constants.MESSAGE.MESSAGE_TYPE_SENT);
-                        break;
-                    default:
-                        values.put(Constants.MESSAGE.TYPE,Constants.MESSAGE.MESSAGE_TYPE_FAILED);
-                        Log.d(TAG,"Message sending failed result Code :" + getResultCode());
-                }
-                try{
-                    ctx.getContentResolver().update(pendingSmsUri,values,null,null);
-                }catch (Exception e){
-                    // ignore exception
-                }
-                return null;
-            }
-        }.execute(ctx,pendingSmsUri);
+        switch (getResultCode()){
+            case Activity.RESULT_OK:
+                Log.d(TAG, "SMS sent");
+                values.put(Constants.MESSAGE.TYPE,Constants.MESSAGE.MESSAGE_TYPE_SENT);
+                break;
+            default:
+                values.put(Constants.MESSAGE.TYPE,Constants.MESSAGE.MESSAGE_TYPE_FAILED);
+                Log.d(TAG,"Message sending failed result Code :" + getResultCode());
+        }
+        try{
+            ctx.getContentResolver().update(pendingSmsUri,values,null,null);
+        }catch (Exception e){
+            Log.w(TAG,"couldn't update sms! some bug here");
+        }
     }
 
 }
