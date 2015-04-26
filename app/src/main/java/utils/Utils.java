@@ -14,14 +14,64 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
+import android.util.Log;
 
+import com.ioane.sharvadze.geosms.objects.Contact;
+import com.ioane.sharvadze.geosms.objects.Conversation;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
+import java.util.ArrayList;
 
 /**
+ * Class Utils
+ *
  * Created by Ioane on 2/25/2015.
  */
 @SuppressLint("NewApi")
 public class Utils {
+
+    private static final String TAG = Utils.class.getSimpleName();
+
+    private static final String CONTACT_LIST_FILE = "file_contact_list";
+
+    public static void saveContactList(Context context,ArrayList<Conversation> contactList){
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(CONTACT_LIST_FILE, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(contactList);
+            os.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @SuppressWarnings("unchecked cast")
+    public static ArrayList<Conversation> loadContactList(Context context){
+        FileInputStream fis = null;
+        ArrayList<Conversation> obj = null;
+        try {
+            fis = context.openFileInput(CONTACT_LIST_FILE);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            obj = (ArrayList<Conversation>) is.readObject();
+            is.close();
+            fis.close();
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.w(TAG,"serialisation exception");
+        }
+        return obj;
+    }
 
     public static Bitmap getCircleBitmap(Bitmap bitmap){
         // create as circle.

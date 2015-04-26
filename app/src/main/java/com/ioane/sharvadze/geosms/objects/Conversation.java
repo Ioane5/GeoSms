@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.SparseArray;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import utils.Constants;
@@ -11,7 +12,7 @@ import utils.Constants;
 /**
  * Created by Ioane on 2/21/2015.
  */
-public class Conversation {
+public class Conversation implements Serializable{
 
     private static final String RECIPIENT_ID = Constants.RECIPIENT_ID;
 

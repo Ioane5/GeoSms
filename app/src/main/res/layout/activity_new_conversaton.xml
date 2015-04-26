@@ -3,22 +3,26 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:divider="@color/theme_grey"
+    android:divider="@drawable/divider"
+    android:showDividers="middle"
     android:orientation="vertical">
 
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+
         android:padding="10dp"
         android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/choose_contacts"
+        android:text="@string/To"
         android:layout_gravity="center"
         android:id="@+id/empty_chosen_contact_view"
         android:background="@color/white"
         />
 
     <GridView
+        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingLeft="5dp"
@@ -29,24 +33,30 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
 
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:clipToPadding="false"
+
         android:horizontalSpacing="10dp"
         android:verticalSpacing="3dp"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
+        android:layout_gravity="center"
+
 
         android:scrollbarStyle="outsideInset"
         android:id="@+id/gridView"
-        android:background="@color/theme_gray_white"
+        android:background="@color/white"
         />
 
 
     <ListView
+        android:animateLayoutChanges="true"
+
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
-        android:choiceMode="multipleChoiceModal"
+        android:layout_weight="3.5"
+        android:choiceMode="none"
         android:id="@+id/contacts_list"
         android:fastScrollEnabled="true"
         />

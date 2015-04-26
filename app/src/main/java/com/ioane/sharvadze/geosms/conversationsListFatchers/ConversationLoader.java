@@ -13,15 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utils.Constants;
+import utils.Utils;
 
 /**
+ * Class ConversationLoader
+ * custom loader that loads data.
+ *
  * Created by Ioane on 3/12/2015.
  */
-public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
+public class ConversationLoader extends AsyncTaskLoader<ArrayList<Conversation>> {
 
     private static final String TAG = ConversationLoader.class.getSimpleName();
 
-    private List<Conversation> mConversations;
+    private ArrayList<Conversation> mConversations;
     private SparseArray<Contact> mContactCache;
 
     private static final Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
@@ -33,8 +37,22 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
         mContactCache = new SparseArray<Contact>();
     }
 
+    private class AsyncConversationSave implements Runnable{
+        private ArrayList<Conversation> conversations;
+        private Context context;
+
+        public AsyncConversationSave(ArrayList<Conversation> conversations,Context context){
+            this.conversations = conversations;
+            this.context = context;
+        }
+        @Override
+        public void run() {
+            Utils.saveContactList(context, conversations);
+        }
+    }
+
     @Override
-    public List<Conversation> loadInBackground() {
+    public ArrayList<Conversation> loadInBackground() {
         mConversations = new ArrayList<Conversation>();
         if(mContactCache == null)
             mContactCache = new SparseArray<Contact>();
@@ -47,6 +65,9 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
             mConversations.add(conversation);
         }
         c.close();
+        // save contacts in cache.
+        new Thread(new AsyncConversationSave(mConversations,getContext())).start();
+
         return mConversations;
     }
 
@@ -55,7 +76,7 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
      * super class will take care of delivering it; the implementation
      * here just adds a little more logic.
      */
-    @Override public void deliverResult(List<Conversation> convers) {
+    @Override public void deliverResult(ArrayList<Conversation> convers) {
         if (isReset()) {
             // An async query came in while the loader is stopped.  We
             // don't need the result.
@@ -63,7 +84,7 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
                 onReleaseResources(convers);
             }
         }
-        List<Conversation> oldConvers = mConversations;
+        ArrayList<Conversation> oldConvers = mConversations;
         mConversations = convers;
 
         if (isStarted()) {
@@ -114,7 +135,7 @@ public class ConversationLoader extends AsyncTaskLoader<List<Conversation>> {
     /**
      * Handles a request to cancel a load.
      */
-    @Override public void onCanceled(List<Conversation> convers) {
+    @Override public void onCanceled(ArrayList<Conversation> convers) {
         super.onCanceled(convers);
 
         // At this point we can release the resources associated with 'apps'

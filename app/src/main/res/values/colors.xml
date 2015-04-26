@@ -34,7 +34,7 @@
     <item name="themeLight2" type="color">#30c8ffa5</item>
 
     <color name="theme_grey">#ffa4a4a4</color>
-    <color name="transparent_gray">#aa808080</color>
+    <color name="transparent_gray">#c9676767</color>
     <item name="conversations_list" type="color">@color/white</item>
 
 

@@ -38,7 +38,7 @@ import utils.MyActivity;
 import utils.Utils;
 
 public class ConversationsListActivity extends MyActivity implements AdapterView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<List<Conversation>> {
+        LoaderManager.LoaderCallbacks<ArrayList<Conversation>> {
 
     private final String TAG = ConversationsListActivity.class.getSimpleName();
 
@@ -72,8 +72,11 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // if it's default app , it changes layout.
         defaultAppResolve();
 
+        ArrayList<Conversation> list = Utils.loadContactList(getBaseContext());
+        if(list == null)
+            list = new ArrayList<>();
         listAdapter = new ConversationsListAdapter(getBaseContext(),
-                R.layout.conversation_item, new ArrayList<Conversation>());
+                R.layout.conversation_item, list);
 
         conversationList = (ListView) findViewById(R.id.conversations_list_view);
         conversationList.setAdapter(listAdapter);
@@ -142,21 +145,21 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
 
     @Override
-    public Loader<List<Conversation>> onCreateLoader(int id, Bundle args) {
+    public Loader<ArrayList<Conversation>> onCreateLoader(int id, Bundle args) {
         // This is called when a new Loader needs to be created.  This
         // sample only has one Loader with no arguments, so it is simple.
         return new ConversationLoader(getBaseContext());
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Conversation>> loader, List<Conversation> data) {
+    public void onLoadFinished(Loader<ArrayList<Conversation>> loader, ArrayList<Conversation> data) {
         // Set the new data in the adapter.
         listAdapter.clear();
         listAdapter.addAll(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Conversation>> loader) {
+    public void onLoaderReset(Loader<ArrayList<Conversation>> loader) {
         // Clear the data in the adapter.
         listAdapter.clear();
     }

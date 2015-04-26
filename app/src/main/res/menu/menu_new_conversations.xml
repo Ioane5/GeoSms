@@ -11,5 +11,11 @@
         yourapp:showAsAction="always"
         yourapp:actionViewClass="android.support.v7.widget.SearchView" />
 
+    <item
+        android:id="@+id/myswitch"
+        android:title=""
+        yourapp:showAsAction="always"
+        android:actionLayout="@layout/switch_layout"
+        />
 
 </menu>

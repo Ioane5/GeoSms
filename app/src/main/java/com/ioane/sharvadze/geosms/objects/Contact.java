@@ -8,10 +8,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 import utils.Constants;
 import utils.Utils;
@@ -199,6 +201,22 @@ public class Contact implements Serializable{
         return true;
     }
 
+
+    /**
+     * Contains function that compares contacts
+     * by it's  address.
+     *
+     * @param contactList The list where we search this contact.
+     * @param address   contact to find in list.
+     * @return true if found, false if not.
+     */
+    public static boolean containsByAddress(List<Contact> contactList,String address){
+        for(Contact cmp : contactList){
+            if(TextUtils.equals(cmp.getAddress(),address))
+                return true;
+        }
+        return false;
+    }
 
 
     @Override
