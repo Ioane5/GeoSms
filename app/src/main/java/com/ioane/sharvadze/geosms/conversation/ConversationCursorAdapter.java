@@ -119,16 +119,16 @@ public class ConversationCursorAdapter extends CursorAdapter {
             case SENT:
                 break;
             case PENDING:
-                //view.setBackgroundColor(Color.BLUE);
                 holder.deliveryStatusView.setText(R.string.sms_pending);
+                holder.deliveryStatusView.setTextColor(Color.GRAY);
                 break;
             case DRAFT:
-                view.setBackgroundColor(Color.GRAY);
                 holder.deliveryStatusView.setText(R.string.sms_draft);
+                holder.deliveryStatusView.setTextColor(Color.GRAY);
                 break;
             case FAILED:
-                //view.setBackgroundColor(Color.RED);
                 holder.deliveryStatusView.setText(R.string.sms_failed);
+                holder.deliveryStatusView.setTextColor(Color.RED);
                 break;
             case RECEIVED:
                 view.setBackgroundColor(receivedMsgCol);

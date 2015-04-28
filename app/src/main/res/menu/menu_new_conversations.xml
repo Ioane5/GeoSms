@@ -1,21 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="newConversation.NewConversatonActivity"
-    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto" >
 
-    <item
-        android:id="@+id/search"
-        android:title="@string/To"
-        android:icon="@android:color/transparent"
+    <item android:id="@+id/start_conversation"
+        android:title="@string/start_conversation"
         yourapp:showAsAction="always"
-        yourapp:actionViewClass="android.support.v7.widget.SearchView" />
-
-    <item
-        android:id="@+id/myswitch"
-        android:title=""
-        yourapp:showAsAction="always"
-        android:actionLayout="@layout/switch_layout"
+        android:icon="@mipmap/ic_check"
         />
 
 </menu>

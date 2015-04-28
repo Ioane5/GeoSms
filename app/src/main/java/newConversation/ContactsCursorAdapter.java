@@ -9,16 +9,12 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AlphabetIndexer;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -102,19 +98,19 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     @Override
     public Object[] getSections() {
-        if(indexer == null) return null;
+        if(indexer == null) return new String[] {" "};
         return indexer.getSections();
     }
 
     @Override
     public int getPositionForSection(int sectionIndex) {
-        if(indexer == null) return 0;
+        if(indexer == null) return -1;
         return indexer.getPositionForSection(sectionIndex);
     }
 
     @Override
     public int getSectionForPosition(int position) {
-       if(indexer == null) return 0;
+       if(indexer == null) return -1;
        return indexer.getSectionForPosition(position);
     }
 
@@ -232,7 +228,7 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
                     v.setImageBitmap(result);
                 }
             }
-        }.execute(imageView,photoUri,ctx,pos);
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,imageView,photoUri,ctx,pos);
     }
 
 }

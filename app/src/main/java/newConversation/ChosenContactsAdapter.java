@@ -1,6 +1,7 @@
 package newConversation;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,6 @@ import android.widget.TextView;
 
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.objects.Contact;
-
-import java.util.List;
 
 /**
  * Class ChosenContactsAdapter for ChosenContacts GridView
@@ -53,7 +52,14 @@ public class ChosenContactsAdapter extends ArrayAdapter<Contact>{
         Contact contact = getItem(position);
         if(contact == null) return view;
         holder.contactImage.setImageBitmap(contact.getPhoto());
-        holder.name.setText(contact.getName());
+
+        if(TextUtils.isEmpty(contact.getName()))
+            holder.name.setVisibility(View.GONE);
+        else{
+            holder.name.setVisibility(View.VISIBLE);
+            holder.name.setText(contact.getName());
+        }
+
         holder.number.setText(contact.getAddress());
 
         return view;

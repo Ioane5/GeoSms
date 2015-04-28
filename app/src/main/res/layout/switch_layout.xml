@@ -10,6 +10,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:textOn=""
+        android:textOff=""
+
+        android:background="@drawable/keyboard_mode_toggle"
          />
 
 </RelativeLayout>

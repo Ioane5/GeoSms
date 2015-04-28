@@ -37,7 +37,8 @@
     <color name="transparent_gray">#c9676767</color>
     <item name="conversations_list" type="color">@color/white</item>
 
-
+    <color name="transparent" type="color">#00000000</color>
+    <color name="themeAccent2">#697cb342</color>
 
     <integer-array name="androidcolors">
         <item>@color/blue</item>

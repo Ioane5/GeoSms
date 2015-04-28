@@ -50,6 +50,8 @@ public interface Constants {
             ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
 
+
+
     interface Actions{
         String MESSAGE_SENT = "sms_sent";
         String SMS_RECEIVED= "SMS_RECEIVED";
