@@ -72,7 +72,6 @@ public class Contact implements Serializable{
     }
 
     public Contact(Cursor c){
-
         Log.i(TAG, Arrays.asList(c.getColumnNames()).toString());
     }
 
@@ -100,12 +99,15 @@ public class Contact implements Serializable{
             setId(id);
             setName(displayName);
             setPhotoUri(photoURI);
-            setPhoto(getPhotoFromURI(photoURI,context));
+
+            //setPhoto(getPhotoFromURI(photoURI,context));
         }
         c.close();
     }
 
     public Contact(Context context,String address){
+        if(address != null)
+            address = Utils.removeWhitespaces(address);
         initFromAddress(context,address);
         setThreadId(0);
     }
@@ -123,7 +125,6 @@ public class Contact implements Serializable{
         if(c.moveToFirst()){
             String address = c.getString(0);
             if(address != null)
-                address = Utils.removeWhitespaces(address);
                 initFromAddress(context,address);
         }
 

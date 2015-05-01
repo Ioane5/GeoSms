@@ -23,10 +23,18 @@ import utils.Utils;
  */
 public class ConversationLoader extends AsyncTaskLoader<ArrayList<Conversation>> {
 
+    @SuppressWarnings("unused")
     private static final String TAG = ConversationLoader.class.getSimpleName();
 
     private ArrayList<Conversation> mConversations;
-    private SparseArray<Contact> mContactCache;
+    /**
+     * This structure saves contacts to cache , to avoid querying
+     * on every db change...
+     *
+     * NOTE: that we may have frequent conversation change. So
+     * for performance it's vital not to query contacts...
+     */
+    private SparseArray<ArrayList<Contact>> mContactCache;
 
     private static final Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
 
@@ -34,7 +42,7 @@ public class ConversationLoader extends AsyncTaskLoader<ArrayList<Conversation>>
 
     public ConversationLoader(Context context) {
         super(context);
-        mContactCache = new SparseArray<Contact>();
+        mContactCache = new SparseArray<>();
     }
 
     private class AsyncConversationSave implements Runnable{
@@ -53,15 +61,15 @@ public class ConversationLoader extends AsyncTaskLoader<ArrayList<Conversation>>
 
     @Override
     public ArrayList<Conversation> loadInBackground() {
-        mConversations = new ArrayList<Conversation>();
+        mConversations = new ArrayList<>();
         if(mContactCache == null)
-            mContactCache = new SparseArray<Contact>();
+            mContactCache = new SparseArray<>();
 
         Cursor c = getContext().getContentResolver().query(uri, null, null, null, "date desc");
         while (c.moveToNext()) {
             int numMsg = c.getInt(c.getColumnIndex(Constants.MSG_COUNT));
             if(numMsg <= 0) continue; // we don't need empty conversations
-            Conversation conversation = new Conversation(getContext(), c,mContactCache);
+            Conversation conversation = new Conversation(getContext(), c, mContactCache);
             mConversations.add(conversation);
         }
         c.close();
@@ -168,6 +176,7 @@ public class ConversationLoader extends AsyncTaskLoader<ArrayList<Conversation>>
         }
     }
 
+    @SuppressWarnings("unused")
     private void onReleaseResources(List<Conversation> conversations) {
         //if(mContactCache != null) mContactCache.clear();
     }

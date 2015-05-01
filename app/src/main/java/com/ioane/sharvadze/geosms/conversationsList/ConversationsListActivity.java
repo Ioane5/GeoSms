@@ -72,8 +72,9 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // if it's default app , it changes layout.
         defaultAppResolve();
 
+        // load list from cache
         ArrayList<Conversation> list = Utils.loadContactList(getBaseContext());
-        if(list == null)
+        if(list == null) // or if we couldn't read cache , create new...
             list = new ArrayList<>();
         listAdapter = new ConversationsListAdapter(getBaseContext(),
                 R.layout.conversation_item, list);
@@ -89,8 +90,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         fab.attachToListView(conversationList);
 
         MyNotificationManager.clearNotifications(getBaseContext());
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(0, null, this);
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
 
@@ -170,6 +171,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         Contact contact = conversation.getContact();
 
         Intent i = new Intent(ConversationsListActivity.this, ConversationActivity.class);
+        // TODO pass arrayList...
         i.putExtra(Constants.CONTACT_BUNDLE, contact != null ? contact.getBundle() : null);
 
         i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -177,6 +179,12 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         //overridePendingTransition(R.animator.abc_slide_in_left, R.anim.abc_fade_out);
     }
 
+    /**
+     * When user clicks new_conversation button we redirect
+     * him to new conversation activity.
+     *
+     * @param view Button that was clicked.
+     */
     public void newConversation(View view){
         Intent i = new Intent(ConversationsListActivity.this, NewConversationActivity.class);
         startActivity(i);
@@ -193,7 +201,6 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         Contact contact = (Contact) v.getTag();
         if (contact == null) {
             Log.i(TAG, "contact null");
-            return;
         } else {
             Intent intent;
             if (TextUtils.isEmpty(contact.getName())) {
