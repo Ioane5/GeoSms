@@ -102,18 +102,17 @@ public class SmsDispatcher extends BroadcastReceiver {
         String address = values.getAsString(Constants.ADDRESS);
         Contact contact = new Contact(ctx,address);
         int threadId = Utils.getSmsThreadId(ctx, smsUri);
-        contact.setThreadId(threadId);
 
         SMS sms = new SMS(values);
-        Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + contact.getThreadId());
-        if(contact.getThreadId() !=  currentThreadId || contact.getThreadId() == THREAD_ID_NONE){
+        Log.i(TAG,"current thread_id = " + currentThreadId  + " contact.ThreadId = " + threadId);
+        if(threadId !=  currentThreadId || threadId == THREAD_ID_NONE){
             NotificationManager mNotificationManager =
                     (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
             // mId allows you to update the notification later on.
             NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
             boolean isSummary =  MyNotificationManager.buildSmsReceiveNotification(ctx, contact, sms, builder);
             //mNotificationManager.notify(MyNotificationManager.ID_SMS_RECEIVED,notif);
-            int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : contact.getThreadId();
+            int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : threadId;
             mNotificationManager.notify(notif_id,builder.build());
         }else {
             values = new ContentValues();
@@ -137,7 +136,7 @@ public class SmsDispatcher extends BroadcastReceiver {
 
         ContentValues values = new ContentValues();
 
-        int threadId = intent.getIntExtra(Constants.RECIPIENT_ID,0);
+        int threadId = intent.getIntExtra(Constants.RECIPIENT_IDS,0);
         if(threadId != 0)
             ConversationsListUpdater.updateConversation(threadId);
 

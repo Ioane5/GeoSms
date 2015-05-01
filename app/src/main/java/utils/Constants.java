@@ -8,6 +8,7 @@ import android.provider.ContactsContract;
  *
  * Created by Ioane on 2/20/2015.
  */
+@SuppressWarnings("unused")
 public interface Constants {
 
     int IMAGE_SIZE = 90;
@@ -15,7 +16,7 @@ public interface Constants {
     String MAGTIFUN = "Magtifun";
     String GEOCELL = "GeoCell";
 
-    String RECIPIENT_ID = "recipient_ids";
+    String RECIPIENT_IDS = "recipient_ids";
 
     String ID = "_id";
 
@@ -32,12 +33,16 @@ public interface Constants {
 
     String MSG_COUNT = "message_count";
 
+    int THREAD_NONE = -30;
+
     /**
      * For intent
      */
     String ADDRESS = "address";
 
     String CONTACT_BUNDLE = "CONTACT";
+
+    String CONTACT_DATA = "CONTACT_DATA";
 
     int KITKAT_API_LEVEL = 19;
     String TOGGLE_CHECKED = "toggle_checked";

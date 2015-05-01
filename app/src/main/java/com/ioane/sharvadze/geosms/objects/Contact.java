@@ -26,8 +26,6 @@ public class Contact implements Serializable{
 
     private int id;
 
-    private int threadId;
-
     private String name;
 
     private String photoUri;
@@ -41,8 +39,7 @@ public class Contact implements Serializable{
 
     private static final String TAG = Contact.class.getSimpleName();
 
-    public Contact(int threadId, String name, String photoUri,String address,Bitmap photo) {
-        this.threadId = threadId;
+    public Contact(String name, String photoUri,String address,Bitmap photo) {
         this.name = name;
         this.photoUri = photoUri;
         this.address = address;
@@ -63,7 +60,6 @@ public class Contact implements Serializable{
     public static final String ADDRESS = "address";
 
     public Contact(Bundle contactData){
-        this.threadId = contactData.getInt(THREAD_ID);
         this.id = contactData.getInt(ID);
         this.name = contactData.getString(NAME);
         this.photoUri =  contactData.getString(PHOTO_URI);
@@ -78,7 +74,6 @@ public class Contact implements Serializable{
     public Bundle getBundle(){
         Bundle bundle = new Bundle();
         bundle.putInt(ID,id);
-        bundle.putInt(THREAD_ID,threadId);
         bundle.putString(NAME,name);
         bundle.putString(PHOTO_URI,photoUri);
         bundle.putString(ADDRESS,address);
@@ -109,12 +104,10 @@ public class Contact implements Serializable{
         if(address != null)
             address = Utils.removeWhitespaces(address);
         initFromAddress(context,address);
-        setThreadId(0);
     }
 
 
     public Contact(Context context,int recipientId,int threadId){
-        setThreadId(threadId);
         setAddress(null);
         setName(null);
         setPhotoUri(null);
@@ -148,14 +141,6 @@ public class Contact implements Serializable{
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getThreadId() {
-        return threadId;
-    }
-
-    public void setThreadId(int id) {
-        this.threadId = id;
     }
 
     public String getName() {
@@ -197,7 +182,6 @@ public class Contact implements Serializable{
         Contact contact = (Contact) o;
 
         if (id != contact.id) return false;
-        if (threadId != contact.threadId) return false;
         if (address != null && !address.equals(contact.getAddress())) return false;
         return true;
     }
@@ -224,7 +208,6 @@ public class Contact implements Serializable{
     public String toString() {
         return "Contact{" +
                 "id= " + id +
-                ", threadId=" + threadId +
                 ", name='" + name + '\'' +
                 ", photoUri='" + photoUri + '\'' +
                 ", address='" + address + '\'' +

@@ -171,8 +171,9 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         Contact contact = conversation.getContact();
 
         Intent i = new Intent(ConversationsListActivity.this, ConversationActivity.class);
-        // TODO pass arrayList...
-        i.putExtra(Constants.CONTACT_BUNDLE, contact != null ? contact.getBundle() : null);
+
+        i.putExtra(Constants.CONTACT_DATA, conversation.getContacts());
+        i.putExtra(Constants.THREAD_ID,conversation.getId());
 
         i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(i);
@@ -211,7 +212,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                 intent.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE,
                         ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
 
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                // TODO need any flags?
+                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
                 startActivity(intent);
             } else {
                 Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));

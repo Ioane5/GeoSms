@@ -1,6 +1,7 @@
 package utils;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.os.Build;
 import android.provider.Telephony;
 import android.util.Log;
 
+import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.io.FileInputStream;
@@ -25,6 +27,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Class Utils
@@ -39,7 +42,7 @@ public class Utils {
     private static final String CONTACT_LIST_FILE = "file_contact_list";
 
     public static void saveContactList(Context context,ArrayList<Conversation> contactList){
-        FileOutputStream fos = null;
+        FileOutputStream fos;
         try {
             fos = context.openFileOutput(CONTACT_LIST_FILE, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -54,7 +57,7 @@ public class Utils {
 
     @SuppressWarnings("unchecked cast")
     public static ArrayList<Conversation> loadContactList(Context context){
-        FileInputStream fis = null;
+        FileInputStream fis;
         ArrayList<Conversation> obj = null;
         try {
             fis = context.openFileInput(CONTACT_LIST_FILE);
@@ -80,12 +83,11 @@ public class Utils {
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
-        final float roundPx = pixels;
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawRoundRect(rectF, pixels, pixels, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
@@ -122,7 +124,7 @@ public class Utils {
         if(c.moveToFirst()){
             Integer i = c.getInt(c.getColumnIndex(Constants.THREAD_ID));
             c.close();
-            return i== null? 0: i;
+            return i;
         }else c.close();
 
         return 0;
@@ -131,5 +133,37 @@ public class Utils {
 
     public static String removeWhitespaces(String address) {
         return address.replaceAll("\\s+","");
+    }
+
+    /**
+     * Returns recipient_ids in sorted order.
+     *
+     * recipient_ids are saved in ascending order.
+     * @param context to resolve ids
+     * @param contacts contacts from which we want ids
+     * @return string ids in ascending order
+     */
+    public static String getRecipientIds(Context context, ArrayList<Contact> contacts){
+        ContentResolver cr = context.getContentResolver();
+        int[] ids = new int[contacts.size()];
+
+        for(int i=0;i<contacts.size();i++){
+            String address = (contacts.get(i).getAddress());
+            Cursor c = cr.query(Uri.parse("content://mms-sms/canonical-addresses"), null,
+                    "address = ?" ,new String[]{address} , null);
+
+            if(c.moveToFirst()){
+                ids[i] = c.getInt(c.getColumnIndex("_id"));
+            }
+            c.close();
+        }
+        Arrays.sort(ids);
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < ids.length; i++) {
+            builder.append(ids[i]);
+            if(i != ids.length - 1)
+                builder.append(" ");
+        }
+        return builder.toString();
     }
 }

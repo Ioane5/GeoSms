@@ -5,11 +5,13 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import utils.Constants;
 
@@ -20,7 +22,7 @@ import utils.Constants;
  */
 public class Conversation implements Serializable{
 
-    private static final String RECIPIENT_IDS = Constants.RECIPIENT_ID;
+    private static final String RECIPIENT_IDS = Constants.RECIPIENT_IDS;
 
     private static final String THREAD_ID = Constants.ID;
 
@@ -41,7 +43,14 @@ public class Conversation implements Serializable{
      *
      * One conversation may have many contacts within it.
      */
-    private int recipientIds;
+    private String recipientIds;
+
+
+    /**
+     * This int represents conversation, (same as thread)
+     * id
+     */
+    private int id;
 
     /**
      *  Last Message
@@ -67,12 +76,11 @@ public class Conversation implements Serializable{
      * @param resolveContact true if we need to resolve contacts
      */
     public Conversation(Context context,Cursor cursor,boolean resolveContact){
-        this.recipientIds = cursor.getInt(cursor.getColumnIndex(RECIPIENT_IDS));
+        this.recipientIds = cursor.getString(cursor.getColumnIndex(RECIPIENT_IDS));
         this.lastMessage = cursor.getString(cursor.getColumnIndex(LAST_MESSAGE));
         this.date = new Date(cursor.getLong(cursor.getColumnIndex(DATE)));
         this.messageRead = cursor.getInt(cursor.getColumnIndex(IS_READ)) == 1;
-
-        // int threadId = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
+        this.id = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
 
         if(resolveContact){
             this.contacts = resolveContacts(context,recipientIds);
@@ -90,22 +98,19 @@ public class Conversation implements Serializable{
      * @param contactCache so save or retrieve contact without querying...
      */
     public Conversation(Context context,Cursor cursor,SparseArray<ArrayList<Contact>> contactCache){
-        this.recipientIds = cursor.getInt(cursor.getColumnIndex(RECIPIENT_IDS));
+        this.recipientIds = cursor.getString(cursor.getColumnIndex(RECIPIENT_IDS));
         this.lastMessage = cursor.getString(cursor.getColumnIndex(LAST_MESSAGE));
         this.date = new Date(cursor.getLong(cursor.getColumnIndex(DATE)));
         this.messageRead = cursor.getInt(cursor.getColumnIndex(IS_READ)) == 1;
+        this.id = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
 
-        // TODO threadId
-        // int threadId = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
-
-
-        ArrayList<Contact> cached= contactCache.get(recipientIds,null);
+        ArrayList<Contact> cached= contactCache.get(id,null);
 
         if(cached == null){
             this.contacts = resolveContacts(context,recipientIds);
         }else{
             // save in cache
-            contactCache.append(recipientIds,contacts);
+            contactCache.append(id,contacts);
         }
 
     }
@@ -117,25 +122,51 @@ public class Conversation implements Serializable{
      * @param recipientIds id to get contacts
      * @return arrayList
      */
-    private ArrayList<Contact> resolveContacts(Context context , int recipientIds){
+    private ArrayList<Contact> resolveContacts(Context context , String recipientIds){
         ArrayList<Contact> resolved =  new ArrayList<>(1); // for most case we don't have group chat.
-
         ContentResolver cr = context.getContentResolver();
-        Cursor c = cr.query(ContentUris.withAppendedId(Uri.parse("content://mms-sms/canonical-address"), recipientIds),
-                null, null, null, null);
 
         // iterate through the recipients...
         // we may have many Group chat.
-        while(c.moveToNext()){
-            String address = c.getString(0);
-            if(address != null){
-                Contact contact = new Contact(context,address);
+        if(TextUtils.isEmpty(recipientIds))
+            return null;
+        StringTokenizer tokenizer = new StringTokenizer(recipientIds," ");
+        while(tokenizer.hasMoreTokens()){
+            try{
+                int rec_id = Integer.parseInt(tokenizer.nextToken());
+                Cursor c = cr.query(ContentUris.withAppendedId(Uri.parse("content://mms-sms/canonical-address"), rec_id),
+                null, null, null, null);
 
-                resolved.add(contact);
+                if(c.moveToFirst()){
+                    String address = c.getString(0);
+                    if(address != null){
+                        Contact contact = new Contact(context,address);
+                        resolved.add(contact);
+                    }
+                }
+
+                c.close();
+            }catch (NumberFormatException e){
+                e.printStackTrace();
             }
         }
-        c.close();
         return resolved;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public ArrayList<Contact> getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(ArrayList<Contact> contacts) {
+        this.contacts = contacts;
     }
 
     public Contact getContact() {
@@ -171,11 +202,11 @@ public class Conversation implements Serializable{
         this.lastMessage = lastMessage;
     }
 
-    public int getRecipientIds() {
+    public String getRecipientIds() {
         return recipientIds;
     }
 
-    public void setRecipientIds(int recipientIds) {
+    public void setRecipientIds(String recipientIds) {
         this.recipientIds = recipientIds;
     }
 
@@ -191,6 +222,6 @@ public class Conversation implements Serializable{
 
     @Override
     public int hashCode() {
-        return recipientIds;
+        return id;
     }
 }

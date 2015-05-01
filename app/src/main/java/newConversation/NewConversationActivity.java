@@ -17,8 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
-import android.
-        text.InputType;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -96,7 +95,7 @@ public class NewConversationActivity extends ActionBarActivity implements
                     String num = c.getString(c.getColumnIndex(ContactsContract.PhoneLookup.NUMBER));
                     String name = c.getString(c.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                     String photoUri = c.getString(c.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI));
-                    contact = new Contact(-1,name,photoUri,num,null);
+                    contact = new Contact(name,photoUri,num,null);
 
                     if(photoUri != null){
                         Bitmap image = Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri,
@@ -105,7 +104,7 @@ public class NewConversationActivity extends ActionBarActivity implements
                     }
 
                 }else {
-                    contact = new Contact(-1,null,null,phoneNumber,null);
+                    contact = new Contact(null,null,phoneNumber,null);
                 }
                 if(!Contact.containsByAddress(chosenContacts, contact.getAddress()))
                     selectContact(contact);
@@ -192,7 +191,7 @@ public class NewConversationActivity extends ActionBarActivity implements
         String phoneNumber = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String photoUri = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
 
-        Contact contact = new Contact(-1,name,photoUri,phoneNumber,null);
+        Contact contact = new Contact(name,photoUri,phoneNumber,null);
         if(photoUri != null){
             Bitmap image = Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri,
                     getBaseContext(), 40));
@@ -292,9 +291,7 @@ public class NewConversationActivity extends ActionBarActivity implements
                     return true;
                 // TODO change this to multi grup chat...
                 Intent intent = new Intent(NewConversationActivity.this, ConversationActivity.class);
-                Contact contact = chosenContacts.get(0);
-                Uri uri = Uri.parse("smsto:" + contact.getAddress());
-                intent.setData(uri);
+                intent.putExtra(Constants.CONTACT_DATA, chosenContacts);
                 startActivity(intent);
                 return true;
         }

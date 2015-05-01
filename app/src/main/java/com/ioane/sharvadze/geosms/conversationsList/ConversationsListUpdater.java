@@ -100,7 +100,7 @@ public class ConversationsListUpdater extends ContentObserver {
                     }
                     for (Integer readThreadId : readConversations){
                         for (int i=0;i<listAdapter.getCount();i++){
-                            if(readThreadId == listAdapter.getItem(i).getContact().getThreadId()){
+                            if(readThreadId == listAdapter.getItem(i).getId()){
                                 listAdapter.getItem(i).setMessageRead(true);
                             }
                         }

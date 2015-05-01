@@ -9,10 +9,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 import com.ioane.sharvadze.geosms.websms.SyncedWebSms;
 import com.ioane.sharvadze.geosms.websms.WebSms;
@@ -23,31 +21,35 @@ import broadcastReceivers.SmsDispatcher;
 import utils.Constants;
 
 /**
+ * Class GeoSmsManager
+ *
+ * manages sms sending
+ *
  * Created by Ioane on 3/1/2015.
  */
 public class GeoSmsManager {
-    private Contact contact;
-    private ListView listView;
-    private Context context;
 
     private static final String TAG = GeoSmsManager.class.getSimpleName();
 
+    /**
+     * Context to get content resolver.
+     */
+    private Context context;
+
+    /**
+     * To send web sms messages.
+     */
     private WebSms webSmsManager;
 
-    public GeoSmsManager(ListView listView,Context context,Contact contact){
-        this.listView = listView;
+    public GeoSmsManager(Context context){
         this.context = context;
-        this.contact = contact;
         this.webSmsManager = new SyncedWebSms(context);
     }
 
 
 
-    PendingIntent pendingIntent;
 
-
-    public void sendSms(SMS sms, String address,Boolean web){
-        // TODO add web checking.
+    public void sendSms(SMS sms, String address, int threadId, Boolean web){
         new AsyncTask<Object,Void,Integer>(){
             /**
              * Executes async task of sending sms through WEB or GSM.
@@ -59,7 +61,8 @@ public class GeoSmsManager {
                 SMS sms = (SMS)params[0];
                 sms.setMsgType(SMS.MsgType.PENDING);
                 String address = (String)params[1];
-                boolean web = (Boolean)params[2];
+                int threadId = (Integer)params[2];
+                boolean web = (Boolean)params[3];
 
 
                 ContentValues values = sms.getContentValues();
@@ -67,14 +70,14 @@ public class GeoSmsManager {
                 Uri insertedSmsURI = context.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
                 Intent sentPI = new Intent(Constants.Actions.MESSAGE_SENT, insertedSmsURI , context.getApplicationContext(), SmsDispatcher.class);
-                sentPI.putExtra(Constants.RECIPIENT_ID,contact.getThreadId());
+                sentPI.putExtra(Constants.RECIPIENT_IDS, threadId);
 
                 if(!web){
-                    // send normal sms using GSM antena.
+                    // send normal sms using GSM.
                     SmsManager manager = SmsManager.getDefault();
 
                     ArrayList<String> dividedMessage = manager.divideMessage(sms.getText());
-                    ArrayList<PendingIntent> sentPIs = new ArrayList<PendingIntent>(dividedMessage.size());
+                    ArrayList<PendingIntent> sentPIs = new ArrayList<>(dividedMessage.size());
                     for (int i = 0; i < dividedMessage.size() ; i++) {
                         sentPIs.add(PendingIntent.getBroadcast(context,0,new Intent(sentPI),0));
                     }
@@ -119,7 +122,7 @@ public class GeoSmsManager {
                 if(messageId != null)
                     Toast.makeText(context,messageId,Toast.LENGTH_SHORT).show();
             }
-        }.execute(sms,address,web);
+        }.execute(sms,address,threadId,web);
 
     }
 

@@ -23,7 +23,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -37,6 +36,7 @@ import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import broadcastReceivers.SmsDispatcher;
@@ -51,13 +51,19 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
     private ConversationCursorAdapter adapter;
     private ToggleButton webUseToggle;
-    /** If user changed toggle, we set as true */
+
+    /** This is our conversation id, this defines in which conversation we are.*/
+    private static int thread_id;
+
+    /** Recipients of the conversation */
+    private ArrayList<Contact> contacts;
 
     private static boolean isKeyboardVisible = false;
+
+    /** If user changed toggle, we set as true */
     private boolean userChangedWebToggle = false;
     private ImageButton button;
     private TextView symbolCounter;
-    private Contact contact;
     private ListView listView;
 
     @Override
@@ -73,17 +79,21 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         symbolCounter = (TextView)findViewById(R.id.symbol_counter);
         editText.addTextChangedListener(this);
 
-        contact = getContact();
-        if(contact == null){
+        initConversation();
+        // if user entered here without contact we disable
+        // everything.
+        if(contacts == null){
             editText.setEnabled(false);
             editText.setFocusable(false);
             return;
         }
-        button.setOnClickListener(new SendButtonListener(contact));
 
-        setTitle(TextUtils.isEmpty(contact.getName())? contact.getAddress(): contact.getName());
+        button.setOnClickListener(new SendButtonListener(contacts));
 
-        adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contact);
+        // TODO SET TITLE.
+        setTitle(TextUtils.isEmpty(contacts.get(0).getName())? contacts.get(0).getAddress(): contacts.get(0).getName());
+
+        adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contacts.get(0));
         listView = (ListView)findViewById(R.id.conversation_list_view);
         listView.setAdapter(adapter);
         //listView.setOnScrollListener(new ListViewKeyboardGestureShow(getBaseContext(),editText));
@@ -105,7 +115,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             button.setEnabled(false);
         }else {
             SharedPreferences prefs = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
-            String text = prefs.getString(contact.getAddress(),null);
+            String text = prefs.getString(Integer.toString(thread_id),null);
             if(!TextUtils.isEmpty(text)) {
                 button.setEnabled(true);
                 editText.setText(text);
@@ -128,34 +138,29 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
      */
     private void startLoader(){
         // if we needn't thread_id resolve we don't create new thread.
-        if(contact.getThreadId() != 0){
-            Bundle bundle = new Bundle();
-            bundle.putInt(Contact.THREAD_ID,contact.getThreadId());
-            getLoaderManager().initLoader(0, bundle, this);
+        if(thread_id != Constants.THREAD_NONE){
+            getLoaderManager().initLoader(0, null, this);
             return;
         }
         new AsyncTask<Void,Void,Void>(){
             @Override
             protected Void doInBackground(Void... params) {
                 // this part resolves thread id.
-                int thread_id;
-                String address = contact.getAddress();
-                ContentValues val = new ContentValues();
-                val.put(Constants.ADDRESS,address);
-                val.put(Constants.MESSAGE.READ, 1);
-                // insert some message
-                Uri insertedSmsURI = getContentResolver().insert(Uri.parse("content://sms/"),val );
-                Cursor c = getContentResolver().query(insertedSmsURI,
-                        new String[]{Constants.THREAD_ID},null,null,null);
-                if(c!= null){
-                    if(c.moveToFirst()){
-                        thread_id = c.getInt(c.getColumnIndex(Constants.THREAD_ID));
-                        contact.setThreadId(thread_id);
-                    }
-                    c.close();
+                String recipientIds = Utils.getRecipientIds(getBaseContext(),contacts);
+
+                Log.i(TAG,"recipientIds " + recipientIds);
+                final Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
+
+                Cursor c = getContentResolver().query(uri, null, Constants.RECIPIENT_IDS + " = ?" ,
+                        new String[]{recipientIds} , null);
+                if(c.moveToFirst()){
+                    thread_id = c.getInt(c.getColumnIndex(Constants.ID));
+                    Log.i(TAG,"theradID resolved " + thread_id);
+                }else{
+                    Log.w(TAG,"we must insert");
                 }
-                getContentResolver().delete(insertedSmsURI,null,null);
-                SmsDispatcher.updateThreadId(contact.getThreadId());
+                c.close();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -167,9 +172,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                Bundle bundle = new Bundle();
-                bundle.putInt(Contact.THREAD_ID,contact.getThreadId());
-                getLoaderManager().initLoader(0, bundle, ConversationActivity.this);
+                getLoaderManager().initLoader(0, null, ConversationActivity.this);
             }
         }.execute();
     }
@@ -177,7 +180,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private void dismissCurrThreadNotifs() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(contact.getThreadId());
+        mNotificationManager.cancel(thread_id);
     }
 
 
@@ -185,16 +188,16 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     protected void onResume() {
         super.onResume();
         Log.i(TAG,"ON RESUME!");
-        if(contact == null){
+        if(contacts == null){
             Log.w(TAG,"contact is null");
             return;
         }
-        SmsDispatcher.updateThreadId(contact.getThreadId());
+        SmsDispatcher.updateThreadId(thread_id);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 dismissCurrThreadNotifs();
-                markConversationAsRead(contact);
+                markConversationAsRead();
             }
         }).start();
     }
@@ -205,34 +208,42 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         SmsDispatcher.updateThreadId(SmsDispatcher.THREAD_ID_NONE);
     }
 
-    private Contact getContact(){
+    /**
+     * This method initializes conversation.
+     *
+     * This means it resolves in which thread we are.
+     * Which contacts are recipients.
+     */
+    @SuppressWarnings("unchecked cast")
+    private void initConversation(){
         try{
             Bundle extras = getIntent().getExtras();
-            Bundle contactData;
-            if(extras != null && (contactData = extras.getBundle(Constants.CONTACT_BUNDLE)) != null){
-                return new Contact(contactData);
+
+            if(extras != null){
+                contacts = (ArrayList<Contact>)extras.getSerializable(Constants.CONTACT_DATA);
+                thread_id = extras.getInt(Constants.THREAD_ID,Constants.THREAD_NONE);
             }else{
                 Uri uri = getIntent().getData();
                 if(uri == null) {
                     Log.w(TAG,"Contact data not provided!");
-                    return null;
+                    return;
                 }
                 String scheme = uri.getScheme();
                 String schemePart = uri.getSchemeSpecificPart();
-                if(scheme == null || schemePart == null) return null;
-                if(!scheme.contains("sms") && !scheme.contains("smsto")) return null;
+                if(scheme == null || schemePart == null) return;
+                if(!scheme.contains("sms") && !scheme.contains("smsto")) return;
 
-                return new Contact(getBaseContext(),schemePart);
+                contacts = new ArrayList<>(1);
+                contacts.add(new Contact(getBaseContext(),schemePart));
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        return null;
     }
 
-    private void markConversationAsRead(final Contact contact){
-        if(contact ==null)return;
-        int threadId = contact.getThreadId();
+    private void markConversationAsRead(){
+        if(thread_id == Constants.THREAD_NONE)
+            return;
         new AsyncTask<Integer,Void,Void>(){
 
             @Override
@@ -244,14 +255,14 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 getContentResolver().update(Uri.parse("content://sms"),cv , ("thread_id = " + threadId), null);
                 return null;
             }
-        }.execute(threadId);
+        }.execute(thread_id);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        if(contact == null) return;
+        if(contacts == null) return;
         EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
         if(!editText.isFocusable()) return; // not save when it's not default
         SharedPreferences drafts = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
@@ -262,16 +273,16 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             editor.putBoolean(Constants.TOGGLE_CHECKED,webUseToggle.isChecked());
         }
         if(editText.getText() == null || editText.getText().toString().equals("")){
-            editor.remove(contact.getAddress());
+            editor.remove(Integer.toString(thread_id));
         }else {
-            editor.putString(contact.getAddress(), editText.getText().toString());
+            editor.putString(Integer.toString(thread_id), editText.getText().toString());
         }
         editor.apply();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        int thread_id = args.getInt(Contact.THREAD_ID);
+        Log.i(TAG,"mda " + thread_id);
         Uri uri = Uri.parse("content://sms/");
         return new CursorLoader(getBaseContext(),uri,null,"thread_id = ?" ,
                 new String[]{Integer.toString(thread_id)},"date asc");
@@ -301,13 +312,12 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
      */
     private class SendButtonListener implements View.OnClickListener{
 
-        private Contact contact;
+        private ArrayList<Contact> contacts;
         private GeoSmsManager smsManager;
 
-        public SendButtonListener(Contact contact){
-            this.contact = contact;
-            smsManager = new GeoSmsManager((ListView)findViewById(R.id.conversation_list_view),
-                    getBaseContext(),contact);
+        public SendButtonListener(ArrayList<Contact> contacts){
+            this.contacts = contacts;
+            smsManager = new GeoSmsManager(getBaseContext());
         }
         @Override
         public void onClick(View view) {
@@ -316,12 +326,12 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
             String message = editText.getText().toString();
             // it's a draft
-            if(contact == null){
+            if(contacts == null){
                 SMS sms = new SMS(message,new Date(System.currentTimeMillis()), SMS.MsgType.DRAFT,true,false,null);
                 smsManager.saveDraft(sms);
             }else{
                 SMS sms = new SMS(message,new Date(System.currentTimeMillis()), SMS.MsgType.PENDING,true,false,null);
-                smsManager.sendSms(sms,contact.getAddress(),isSendWeb());
+                smsManager.sendSms(sms,contacts.get(0).getAddress(),thread_id,isSendWeb());
             }
             if (editText.length() > 0) {
                 editText.setText(null);
@@ -333,10 +343,10 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        int pos = listView.getFirstVisiblePosition();
-        Log.i(TAG,"THIS SHIT BEFORE IS  = " + pos);
-
-        outState.putInt("scroll_pos",pos);
+        if(listView != null){
+            int pos = listView.getFirstVisiblePosition();
+            outState.putInt("scroll_pos",pos);
+        }
     }
 
     @Override
@@ -376,36 +386,6 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 isKeyboardVisible = ratio < 0.75;
             }
         });
-    }
-
-    /**
-     * Static class ListViewKeyboardGestureShow
-     * ------------------------------------------
-     * This class :
-     *  * hides soft keyboard when user scrolls.
-     *
-     * It's common good practice to make such a gesture
-     * pleasure for user.
-     */
-    private static class ListViewKeyboardGestureShow implements  AbsListView.OnScrollListener {
-        private EditText editText;
-        private InputMethodManager imm;
-
-        public ListViewKeyboardGestureShow(Context context,EditText editText){
-            this.editText = editText;
-            imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        }
-
-        @Override
-        public void onScrollStateChanged(final AbsListView view, int scrollState) {
-            if(isKeyboardVisible)
-                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        }
-
     }
 
 
@@ -459,7 +439,9 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() ==  R.id.action_call){
-            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", contact.getAddress(), null));
+            if(contacts == null || contacts.size() <= 0)
+                return false;
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", contacts.get(0).getAddress(), null));
             startActivity(intent);
             return true;
         }else

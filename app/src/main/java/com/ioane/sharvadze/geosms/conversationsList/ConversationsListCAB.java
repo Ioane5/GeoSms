@@ -89,7 +89,7 @@ public class ConversationsListCAB {
                                     for(int i=0;i<checkedItems.size();i++){
                                         if(checkedItems.valueAt(i)){
                                             int key = checkedItems.keyAt(i);
-                                            int threadId = listAdapter.getItem(key).getContact().getThreadId();
+                                            int threadId = listAdapter.getItem(key).getId();
                                             Log.i(TAG,"deleting threadId = "  + threadId);
                                             context.getContentResolver().delete(
                                                     Uri.parse("content://mms-sms/conversations"),

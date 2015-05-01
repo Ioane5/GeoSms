@@ -181,7 +181,7 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-        return new Contact(-1,name,photoUri,phoneNumber,null);
+        return new Contact(name,photoUri,phoneNumber,null);
     }
 
 
