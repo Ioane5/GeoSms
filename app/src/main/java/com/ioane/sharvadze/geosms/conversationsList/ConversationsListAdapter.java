@@ -77,14 +77,12 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
         holder.messageView.setText("");
 
         Contact contact = conversation.getContact();
+        String header = Utils.getChatHeader(conversation.getContacts());
+
         holder.contactImageView.setTag(contact);
 
         if(contact != null){
-            if(contact.getName() != null && !contact.getName().equals("")){
-                holder.contactNameView.setText(contact.getName());
-            }else{
-                holder.contactNameView.setText(contact.getAddress());
-            }
+            holder.contactNameView.setText(header);
             if(contact.getPhotoUri() != null){
                 holder.contactImageView.setImageBitmap(contact.getPhoto());
             }

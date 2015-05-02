@@ -23,6 +23,7 @@ import com.ioane.sharvadze.geosms.objects.Contact;
 
 import java.util.ArrayList;
 
+import utils.AsyncImageDownloader;
 import utils.Utils;
 
 /**
@@ -44,6 +45,8 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     private ArrayList<Contact> mSelectedContacts;
 
+    private AsyncImageDownloader mImageDownloader;
+
     public ContactsCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
@@ -54,6 +57,8 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
         indexer = new AlphabetIndexer(null, 0 , " ABCDEFGHIJKLMNOPQRTSUVWXYZ0123456789");
         mSelectedContacts = null;
+
+        mImageDownloader = new AsyncImageDownloader(context);
     }
 
     public void setSelectedContacts(ArrayList<Contact> selectedContacts){
@@ -158,14 +163,15 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         holder.phoneKindView.setText(phoneType);
         holder.phoneNumberView.setText(phoneNumber);
 
-        holder.contactPhotoView.setTag(cursor.getPosition());
+        //holder.contactPhotoView.setTag(cursor.getPosition());
+        holder.contactPhotoView.setTag(photoUri);
 
         if(isSelected(phoneNumber)){
             holder.contactPhotoView.setImageDrawable(SELECTED_CONTACT_IMAGE);
         }else{
             if(photoUri != null){
                 holder.contactPhotoView.setImageBitmap(null);
-                setImage(holder.contactPhotoView, photoUri, context, cursor.getPosition());
+                mImageDownloader.addImage(photoUri,holder.contactPhotoView);
             }else
                 holder.contactPhotoView.setImageBitmap(DEFAULT_IMAGE);
         }

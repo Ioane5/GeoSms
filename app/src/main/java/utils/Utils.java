@@ -2,6 +2,7 @@ package utils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -135,6 +136,14 @@ public class Utils {
         return address.replaceAll("\\s+","");
     }
 
+
+    private static final Uri canonical_addresses = Uri.parse("content://mms-sms/canonical-addresses");
+    private static final Uri canonical_address = Uri.parse("content://mms-sms/canonical-address");
+
+
+    private static Uri sAllCanonical =
+            Uri.parse("content://mms-sms/canonical-addresses");
+
     /**
      * Returns recipient_ids in sorted order.
      *
@@ -147,13 +156,19 @@ public class Utils {
         ContentResolver cr = context.getContentResolver();
         int[] ids = new int[contacts.size()];
 
+
         for(int i=0;i<contacts.size();i++){
             String address = (contacts.get(i).getAddress());
-            Cursor c = cr.query(Uri.parse("content://mms-sms/canonical-addresses"), null,
-                    "address = ?" ,new String[]{address} , null);
+            Cursor c = cr.query(canonical_addresses, null, "address = ?" ,new String[]{address} , null);
 
             if(c.moveToFirst()){
                 ids[i] = c.getInt(c.getColumnIndex("_id"));
+            }else{
+                Log.w(TAG, "for address " + address + " we didn't find canonical, so we insert");
+
+                final ContentValues values= new ContentValues();
+                values.put(Telephony.CanonicalAddressesColumns.ADDRESS, address);
+                cr.insert(sAllCanonical,values);
             }
             c.close();
         }
@@ -165,5 +180,23 @@ public class Utils {
                 builder.append(" ");
         }
         return builder.toString();
+    }
+
+
+    /**
+     * Returns header from contacts.
+     *
+     * @param contacts list from which header is cereated.
+     * @return header
+     */
+    public static String getChatHeader(ArrayList<Contact> contacts){
+        StringBuilder header = new StringBuilder();
+        for(int i=0;i<contacts.size();i++){
+            Contact c = contacts.get(i);
+            header.append(c.getName() != null ? c.getName() : c.getAddress());
+            if(i != contacts.size() -1)
+                header.append(", ");
+        }
+        return header.toString();
     }
 }

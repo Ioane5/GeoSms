@@ -90,8 +90,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
         button.setOnClickListener(new SendButtonListener(contacts));
 
-        // TODO SET TITLE.
-        setTitle(TextUtils.isEmpty(contacts.get(0).getName())? contacts.get(0).getAddress(): contacts.get(0).getName());
+        setTitle(Utils.getChatHeader(contacts));
 
         adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contacts.get(0));
         listView = (ListView)findViewById(R.id.conversation_list_view);
@@ -282,7 +281,6 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(TAG,"mda " + thread_id);
         Uri uri = Uri.parse("content://sms/");
         return new CursorLoader(getBaseContext(),uri,null,"thread_id = ?" ,
                 new String[]{Integer.toString(thread_id)},"date asc");

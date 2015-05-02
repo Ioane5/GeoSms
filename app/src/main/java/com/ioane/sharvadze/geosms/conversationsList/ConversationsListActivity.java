@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -24,13 +23,11 @@ import android.widget.Toast;
 import com.ioane.sharvadze.geosms.MyNotificationManager;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
-import com.ioane.sharvadze.geosms.conversationsListFatchers.ConversationLoader;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import newConversation.NewConversationActivity;
 import utils.Constants;
@@ -44,19 +41,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
     private ListView conversationList;
 
-    private Cursor loadingData;
-
     private ArrayAdapter<Conversation> listAdapter;
 
-
-    /**
-     * This means how many conversations to fetch at first time.
-     * And than we will fetch by thread in parallel to not make
-     * user wait.
-     */
-    private final int INITIAL_CONVERSATION_LOAD_NUM = 8;
-
-    private static List<Integer> updateConversations = new ArrayList<Integer>();
 
 
     /**
@@ -72,12 +58,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // if it's default app , it changes layout.
         defaultAppResolve();
 
-        // load list from cache
-        ArrayList<Conversation> list = Utils.loadContactList(getBaseContext());
-        if(list == null) // or if we couldn't read cache , create new...
-            list = new ArrayList<>();
         listAdapter = new ConversationsListAdapter(getBaseContext(),
-                R.layout.conversation_item, list);
+                R.layout.conversation_item, new ArrayList<Conversation>());
 
         conversationList = (ListView) findViewById(R.id.conversations_list_view);
         conversationList.setAdapter(listAdapter);
@@ -119,7 +101,6 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         Button button = (Button) findViewById(R.id.change_default_app);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d(TAG, "clicked on button");
                 Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
                 intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, getPackageName());
                 startActivityForResult(intent, DEFAULT_SMS_REQUEST);
@@ -149,7 +130,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     public Loader<ArrayList<Conversation>> onCreateLoader(int id, Bundle args) {
         // This is called when a new Loader needs to be created.  This
         // sample only has one Loader with no arguments, so it is simple.
-        return new ConversationLoader(getBaseContext());
+        return new ConversationListLoader(getBaseContext());
     }
 
     @Override
@@ -168,7 +149,6 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Conversation conversation = listAdapter.getItem(position);
-        Contact contact = conversation.getContact();
 
         Intent i = new Intent(ConversationsListActivity.this, ConversationActivity.class);
 
