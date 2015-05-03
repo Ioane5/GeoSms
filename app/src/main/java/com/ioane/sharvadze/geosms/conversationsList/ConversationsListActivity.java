@@ -138,6 +138,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // Set the new data in the adapter.
         listAdapter.clear();
         listAdapter.addAll(data);
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -153,7 +154,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         Intent i = new Intent(ConversationsListActivity.this, ConversationActivity.class);
 
         i.putExtra(Constants.CONTACT_DATA, conversation.getContacts());
-        i.putExtra(Constants.THREAD_ID,conversation.getId());
+        i.putExtra(Constants.THREAD_ID, conversation.getId());
 
         i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(i);
@@ -177,9 +178,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     }
 
     public void onContactImageClick(View v) {
-        Log.i(TAG, "contact clicked " + v.getClass().getSimpleName());
-
-        Contact contact = (Contact) v.getTag();
+        Contact contact = (Contact) v.getTag(R.string.contact);
         if (contact == null) {
             Log.i(TAG, "contact null");
         } else {

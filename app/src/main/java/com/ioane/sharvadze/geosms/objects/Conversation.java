@@ -5,11 +5,13 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
-import android.util.SparseArray;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -21,6 +23,8 @@ import utils.Constants;
  * Created by Ioane on 2/21/2015.
  */
 public class Conversation implements Serializable{
+
+    private static final String TAG = Conversation.class.getSimpleName();
 
     private static final String RECIPIENT_IDS = Constants.RECIPIENT_IDS;
 
@@ -50,7 +54,7 @@ public class Conversation implements Serializable{
      * This int represents conversation, (same as thread)
      * id
      */
-    private int id;
+    private long id;
 
     /**
      *  Last Message
@@ -97,12 +101,12 @@ public class Conversation implements Serializable{
      * @param cursor cursor to get data from.
      * @param contactCache so save or retrieve contact without querying...
      */
-    public Conversation(Context context,Cursor cursor,SparseArray<ArrayList<Contact>> contactCache){
+    public Conversation(Context context,Cursor cursor,LongSparseArray<ArrayList<Contact>> contactCache){
         this.recipientIds = cursor.getString(cursor.getColumnIndex(RECIPIENT_IDS));
         this.lastMessage = cursor.getString(cursor.getColumnIndex(LAST_MESSAGE));
         this.date = new Date(cursor.getLong(cursor.getColumnIndex(DATE)));
         this.messageRead = cursor.getInt(cursor.getColumnIndex(IS_READ)) == 1;
-        this.id = cursor.getInt(cursor.getColumnIndex(THREAD_ID));
+        this.id = cursor.getLong(cursor.getColumnIndex(THREAD_ID));
 
         ArrayList<Contact> cached= contactCache.get(id,null);
 
@@ -153,7 +157,7 @@ public class Conversation implements Serializable{
         return resolved;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -217,11 +221,64 @@ public class Conversation implements Serializable{
 
         Conversation that = (Conversation) o;
 
-        return recipientIds == that.recipientIds;
+        return TextUtils.equals(recipientIds,that.recipientIds);
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return (int)id;
     }
+
+
+    private static final Uri THREAD_ID_CONTENT_URI = Uri.parse(
+            "content://mms-sms/threadID");
+
+
+    /**
+     * {@inheritDoc getOrCreateThreadId}
+     * @param context
+     * @param address
+     * @return
+     */
+    public static long getOrCreateThreadId(Context context, String address){
+        ArrayList<String> list = new ArrayList<>(1);
+        list.add(address);
+        return getOrCreateThreadId(context, list);
+    }
+
+    /**
+     * Searches thread_id for these recipients.
+     * If thread didn't exist. It creates new and returns.
+     *
+     * @param context to lookup db.
+     * @param recipients recipients in conversation.
+     * @return Created or found thread_id
+     */
+    public static long getOrCreateThreadId(
+            Context context, Collection<String> recipients) {
+        Uri.Builder uriBuilder = THREAD_ID_CONTENT_URI.buildUpon();
+
+        for (String recipient : recipients) {
+            uriBuilder.appendQueryParameter("recipient", recipient);
+        }
+
+        Uri uri = uriBuilder.build();
+
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    return cursor.getLong(0);
+                } else {
+                    Log.e(TAG, "getOrCreateThreadId returned no rows!");
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        Log.e(TAG, "getOrCreateThreadId failed with uri " + uri.toString());
+        throw new IllegalArgumentException("Unable to find or allocate a thread ID.");
+    }
+
 }

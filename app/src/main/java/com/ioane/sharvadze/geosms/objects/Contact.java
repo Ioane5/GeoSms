@@ -12,7 +12,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import utils.Constants;
@@ -77,7 +79,7 @@ public class Contact implements Serializable{
         bundle.putString(NAME,name);
         bundle.putString(PHOTO_URI,photoUri);
         bundle.putString(ADDRESS,address);
-        bundle.putParcelable(PHOTO,photo);
+        bundle.putParcelable(PHOTO, photo);
         return bundle;
     }
 
@@ -103,7 +105,7 @@ public class Contact implements Serializable{
     public Contact(Context context,String address){
         if(address != null)
             address = Utils.removeWhitespaces(address);
-        initFromAddress(context,address);
+        initFromAddress(context, address);
     }
 
 
@@ -203,6 +205,20 @@ public class Contact implements Serializable{
         return false;
     }
 
+
+    /**
+     * Returns Address list from contact list.
+     *
+     * @param contactList contact list
+     * @return address array list
+     */
+    public static Collection<String> toAddressArray(ArrayList<Contact> contactList){
+        ArrayList<String> address = new ArrayList<>(contactList.size());
+        for(Contact contact : contactList){
+            address.add(contact.getAddress());
+        }
+        return address;
+    }
 
     @Override
     public String toString() {

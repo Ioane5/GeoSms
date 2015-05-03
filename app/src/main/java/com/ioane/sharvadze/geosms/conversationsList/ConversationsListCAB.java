@@ -89,11 +89,11 @@ public class ConversationsListCAB {
                                     for(int i=0;i<checkedItems.size();i++){
                                         if(checkedItems.valueAt(i)){
                                             int key = checkedItems.keyAt(i);
-                                            int threadId = listAdapter.getItem(key).getId();
+                                            long threadId = listAdapter.getItem(key).getId();
                                             Log.i(TAG,"deleting threadId = "  + threadId);
                                             context.getContentResolver().delete(
                                                     Uri.parse("content://mms-sms/conversations"),
-                                                    "thread_id=?", new String[] {Integer.toString(threadId)});
+                                                    "thread_id=?", new String[] {Long.toString(threadId)});
                                         }
                                     }
                                     return null;
@@ -102,7 +102,7 @@ public class ConversationsListCAB {
                                 protected void onPostExecute(Void aVoid) {
                                     super.onPostExecute(aVoid);
                                     Log.i(TAG,"now in OpPostExecute");
-                                    List<Conversation> toDel = new ArrayList<Conversation>();
+                                    List<Conversation> toDel = new ArrayList<>();
                                     for(int i=0;i<checkedItems.size();i++){
                                         if(checkedItems.valueAt(i)){
                                             int key = checkedItems.keyAt(i);

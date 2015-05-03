@@ -19,6 +19,7 @@ import com.ioane.sharvadze.geosms.conversationsList.ConversationsListActivity;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import utils.Constants;
@@ -60,7 +61,9 @@ public class MyNotificationManager extends BroadcastReceiver{
         setPriority(mBuilder);
 
         Intent resultIntent = new Intent(ctx, ConversationActivity.class);
-        resultIntent.putExtra(Constants.CONTACT_BUNDLE,contact.getBundle());
+        ArrayList<Contact> data = new ArrayList<>(1);
+        data.add(contact);
+        resultIntent.putExtra(Constants.CONTACT_DATA, data);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(ctx);
         stackBuilder.addParentStack(ConversationActivity.class);

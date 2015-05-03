@@ -49,6 +49,9 @@
     <string name="Name_Number"><i>Enter Name or Number</i></string>
     <string name="add_contact_from_external">Add contact from contact picker</string>
     <string name="send_to">Sms to</string>
+    <string name="contact">contact</string>
+
+
 
 
 </resources>

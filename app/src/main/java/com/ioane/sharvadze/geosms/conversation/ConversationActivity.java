@@ -34,6 +34,7 @@ import com.ioane.sharvadze.geosms.GeoSmsManager;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
+import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private ToggleButton webUseToggle;
 
     /** This is our conversation id, this defines in which conversation we are.*/
-    private static int thread_id;
+    private static long thread_id;
 
     /** Recipients of the conversation */
     private ArrayList<Contact> contacts;
@@ -95,10 +96,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         adapter = new ConversationCursorAdapter(getBaseContext(),null,true,contacts.get(0));
         listView = (ListView)findViewById(R.id.conversation_list_view);
         listView.setAdapter(adapter);
-        //listView.setOnScrollListener(new ListViewKeyboardGestureShow(getBaseContext(),editText));
         listView.setOnTouchListener(new View.OnTouchListener() {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                     if(isKeyboardVisible)
@@ -114,7 +113,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             button.setEnabled(false);
         }else {
             SharedPreferences prefs = getSharedPreferences(Constants.DRAFTS_FILE,MODE_PRIVATE);
-            String text = prefs.getString(Integer.toString(thread_id),null);
+            String text = prefs.getString(Long.toString(thread_id),null);
             if(!TextUtils.isEmpty(text)) {
                 button.setEnabled(true);
                 editText.setText(text);
@@ -138,6 +137,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private void startLoader(){
         // if we needn't thread_id resolve we don't create new thread.
         if(thread_id != Constants.THREAD_NONE){
+            SmsDispatcher.updateThreadId(thread_id);
             getLoaderManager().initLoader(0, null, this);
             return;
         }
@@ -145,32 +145,14 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             @Override
             protected Void doInBackground(Void... params) {
                 // this part resolves thread id.
-                String recipientIds = Utils.getRecipientIds(getBaseContext(),contacts);
-
-                Log.i(TAG,"recipientIds " + recipientIds);
-                final Uri uri = Uri.parse("content://mms-sms/conversations?simple=true");
-
-                Cursor c = getContentResolver().query(uri, null, Constants.RECIPIENT_IDS + " = ?" ,
-                        new String[]{recipientIds} , null);
-                if(c.moveToFirst()){
-                    thread_id = c.getInt(c.getColumnIndex(Constants.ID));
-                    Log.i(TAG,"theradID resolved " + thread_id);
-                }else{
-                    Log.w(TAG,"we must insert");
-                }
-                c.close();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissCurrThreadNotifs();
-                    }
-                }).start();
+                thread_id = Conversation.getOrCreateThreadId(getBaseContext(),
+                        Contact.toAddressArray(contacts));
                 return null;
             }
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
+                SmsDispatcher.updateThreadId(thread_id);
                 getLoaderManager().initLoader(0, null, ConversationActivity.this);
             }
         }.execute();
@@ -179,14 +161,13 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private void dismissCurrThreadNotifs() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(thread_id);
+        mNotificationManager.cancel((int) thread_id);
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG,"ON RESUME!");
         if(contacts == null){
             Log.w(TAG,"contact is null");
             return;
@@ -220,7 +201,13 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
             if(extras != null){
                 contacts = (ArrayList<Contact>)extras.getSerializable(Constants.CONTACT_DATA);
-                thread_id = extras.getInt(Constants.THREAD_ID,Constants.THREAD_NONE);
+                Long passed_tid = extras.getLong(Constants.THREAD_ID, -1);
+                if(passed_tid == -1 &&  contacts != null){
+                    thread_id = Conversation.getOrCreateThreadId(getBaseContext(),
+                            Contact.toAddressArray(contacts));
+                }else
+                    thread_id = passed_tid;
+
             }else{
                 Uri uri = getIntent().getData();
                 if(uri == null) {
@@ -235,6 +222,12 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 contacts = new ArrayList<>(1);
                 contacts.add(new Contact(getBaseContext(),schemePart));
             }
+            if(contacts == null)
+                return;
+            for(Contact c : contacts){
+                if(c.getPhotoUri() != null)
+                    c.setPhoto(Utils.getCircleBitmap(Utils.getPhotoFromURI(c.getPhotoUri(),getBaseContext(),50)));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -243,11 +236,11 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     private void markConversationAsRead(){
         if(thread_id == Constants.THREAD_NONE)
             return;
-        new AsyncTask<Integer,Void,Void>(){
+        new AsyncTask<Long,Void,Void>(){
 
             @Override
-            protected Void doInBackground(Integer... params) {
-                int threadId = params[0];
+            protected Void doInBackground(Long... params) {
+                long threadId = params[0];
                 ContentValues cv =  new ContentValues();
                 cv.put(Constants.MESSAGE.READ,1);
                 ConversationsListUpdater.markAsRead(threadId);
@@ -272,9 +265,9 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             editor.putBoolean(Constants.TOGGLE_CHECKED,webUseToggle.isChecked());
         }
         if(editText.getText() == null || editText.getText().toString().equals("")){
-            editor.remove(Integer.toString(thread_id));
+            editor.remove(Long.toString(thread_id));
         }else {
-            editor.putString(Integer.toString(thread_id), editText.getText().toString());
+            editor.putString(Long.toString(thread_id), editText.getText().toString());
         }
         editor.apply();
     }
@@ -283,7 +276,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = Uri.parse("content://sms/");
         return new CursorLoader(getBaseContext(),uri,null,"thread_id = ?" ,
-                new String[]{Integer.toString(thread_id)},"date asc");
+                new String[]{Long.toString(thread_id)},"date asc");
     }
 
     @Override
@@ -435,6 +428,17 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(contacts != null && contacts.size() > 1){
+            MenuItem item = menu.findItem(R.id.action_call);
+            item.setVisible(false);
+            supportInvalidateOptionsMenu();
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() ==  R.id.action_call){
             if(contacts == null || contacts.size() <= 0)
@@ -444,6 +448,5 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             return true;
         }else
             return super.onOptionsItemSelected(item);
-
     }
 }

@@ -1,10 +1,7 @@
 package utils;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -28,7 +25,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Class Utils
@@ -120,67 +116,22 @@ public class Utils {
         return null;
     }
 
-    public static int getSmsThreadId(Context ctx,Uri uri) {
-        Cursor c = ctx.getContentResolver().query(uri,new String[]{Constants.THREAD_ID},null,null,null);
-        if(c.moveToFirst()){
-            Integer i = c.getInt(c.getColumnIndex(Constants.THREAD_ID));
-            c.close();
-            return i;
-        }else c.close();
-
-        return 0;
-    }
+//    public static int getSmsThreadId(Context ctx,Uri uri) {
+//        Cursor c = ctx.getContentResolver().query(uri,new String[]{Constants.THREAD_ID},null,null,null);
+//        if(c.moveToFirst()){
+//            Integer i = c.getInt(c.getColumnIndex(Constants.THREAD_ID));
+//            c.close();
+//            return i;
+//        }else c.close();
+//
+//        return 0;
+//    }
 
 
     public static String removeWhitespaces(String address) {
-        return address.replaceAll("\\s+","");
+        return address.replaceAll("\\s+", "");
     }
 
-
-    private static final Uri canonical_addresses = Uri.parse("content://mms-sms/canonical-addresses");
-    private static final Uri canonical_address = Uri.parse("content://mms-sms/canonical-address");
-
-
-    private static Uri sAllCanonical =
-            Uri.parse("content://mms-sms/canonical-addresses");
-
-    /**
-     * Returns recipient_ids in sorted order.
-     *
-     * recipient_ids are saved in ascending order.
-     * @param context to resolve ids
-     * @param contacts contacts from which we want ids
-     * @return string ids in ascending order
-     */
-    public static String getRecipientIds(Context context, ArrayList<Contact> contacts){
-        ContentResolver cr = context.getContentResolver();
-        int[] ids = new int[contacts.size()];
-
-
-        for(int i=0;i<contacts.size();i++){
-            String address = (contacts.get(i).getAddress());
-            Cursor c = cr.query(canonical_addresses, null, "address = ?" ,new String[]{address} , null);
-
-            if(c.moveToFirst()){
-                ids[i] = c.getInt(c.getColumnIndex("_id"));
-            }else{
-                Log.w(TAG, "for address " + address + " we didn't find canonical, so we insert");
-
-                final ContentValues values= new ContentValues();
-                values.put(Telephony.CanonicalAddressesColumns.ADDRESS, address);
-                cr.insert(sAllCanonical,values);
-            }
-            c.close();
-        }
-        Arrays.sort(ids);
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < ids.length; i++) {
-            builder.append(ids[i]);
-            if(i != ids.length - 1)
-                builder.append(" ");
-        }
-        return builder.toString();
-    }
 
 
     /**
@@ -199,4 +150,13 @@ public class Utils {
         }
         return header.toString();
     }
+
+
+
+
+
+
+
+
+
 }

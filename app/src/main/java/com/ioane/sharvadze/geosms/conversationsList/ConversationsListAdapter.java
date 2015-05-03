@@ -18,6 +18,7 @@ import com.ioane.sharvadze.geosms.objects.Conversation;
 
 import java.util.List;
 
+import utils.AsyncImageDownloader;
 import utils.Utils;
 
 /**
@@ -34,6 +35,8 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
 
     private Bitmap DEFAULT_IMAGE;
 
+    private AsyncImageDownloader mImageDownloader;
+
     private class ViewHolder {
         TextView contactNameView;
         TextView messageView;
@@ -48,6 +51,7 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
                 R.mipmap.ic_no_image);
         // make it circle like.
         DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
+        mImageDownloader = new AsyncImageDownloader(context);
     }
 
     @Override
@@ -79,12 +83,13 @@ public class ConversationsListAdapter extends ArrayAdapter<Conversation> {
         Contact contact = conversation.getContact();
         String header = Utils.getChatHeader(conversation.getContacts());
 
-        holder.contactImageView.setTag(contact);
+        holder.contactImageView.setTag(contact == null ? null : contact.getPhotoUri());
+        holder.contactImageView.setTag(R.string.contact,contact);
 
         if(contact != null){
             holder.contactNameView.setText(header);
             if(contact.getPhotoUri() != null){
-                holder.contactImageView.setImageBitmap(contact.getPhoto());
+                mImageDownloader.addImage(contact.getPhotoUri(),holder.contactImageView);
             }
         }
         holder.messageView.setText(conversation.getLastMessage());

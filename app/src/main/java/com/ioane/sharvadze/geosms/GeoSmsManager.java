@@ -49,7 +49,7 @@ public class GeoSmsManager {
 
 
 
-    public void sendSms(SMS sms, String address, int threadId, Boolean web){
+    public void sendSms(SMS sms, String address, long threadId, Boolean web){
         new AsyncTask<Object,Void,Integer>(){
             /**
              * Executes async task of sending sms through WEB or GSM.
@@ -61,7 +61,7 @@ public class GeoSmsManager {
                 SMS sms = (SMS)params[0];
                 sms.setMsgType(SMS.MsgType.PENDING);
                 String address = (String)params[1];
-                int threadId = (Integer)params[2];
+                long threadId = (Long)params[2];
                 boolean web = (Boolean)params[3];
 
 

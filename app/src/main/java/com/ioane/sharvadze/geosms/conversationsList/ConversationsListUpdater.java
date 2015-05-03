@@ -18,8 +18,8 @@ import java.util.List;
  */
 public class ConversationsListUpdater extends ContentObserver {
 
-    private static List<Integer> updateConversations =  new ArrayList<Integer>();
-    private static List<Integer> readConversations =  new ArrayList<Integer>();
+    private static List<Long> updateConversations =  new ArrayList<>();
+    private static List<Long> readConversations =  new ArrayList<>();
 
     private static String TAG = ConversationsListUpdater.class.getSimpleName();
     private Context ctx;
@@ -50,13 +50,13 @@ public class ConversationsListUpdater extends ContentObserver {
 
 
 
-    public static void updateConversation(int updatedThreadId){
+    public static void updateConversation(long updatedThreadId){
         synchronized (updateConversations){
             updateConversations.add(updatedThreadId);
         }
     }
 
-    public static void markAsRead(int threadId) {
+    public static void markAsRead(long threadId) {
         synchronized (readConversations){
             readConversations.add(threadId);
         }
@@ -71,9 +71,9 @@ public class ConversationsListUpdater extends ContentObserver {
                 synchronized (updateConversations) {
                     if (updateConversations.size() == 0) return null;
                     Log.i(TAG, "updating conversations");
-                    for (int recipientId : updateConversations) {
+                    for (long recipientId : updateConversations) {
                         Cursor c = ctx.getContentResolver().query(uri, null, "_id = ?",
-                                new String[]{Integer.toString(recipientId)}, null);
+                                new String[]{Long.toString(recipientId)}, null);
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 Conversation conversation = new Conversation(ctx, c, true);
@@ -98,7 +98,7 @@ public class ConversationsListUpdater extends ContentObserver {
                             listAdapter.insert(con, 0);
                         }
                     }
-                    for (Integer readThreadId : readConversations){
+                    for (Long readThreadId : readConversations){
                         for (int i=0;i<listAdapter.getCount();i++){
                             if(readThreadId == listAdapter.getItem(i).getId()){
                                 listAdapter.getItem(i).setMessageRead(true);

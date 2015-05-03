@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.SparseArray;
+import android.support.v4.util.LongSparseArray;
 
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
@@ -27,7 +27,7 @@ public class ConversationListLoader extends AsyncTaskLoader<ArrayList<Conversati
 
 
     private ConversationsContentObserver mConversationObserver;
-    private SparseArray<ArrayList<Contact>> mContactCache;
+    private LongSparseArray<ArrayList<Contact>> mContactCache;
 
 
     public ConversationListLoader(Context context){
@@ -40,7 +40,7 @@ public class ConversationListLoader extends AsyncTaskLoader<ArrayList<Conversati
 
         ArrayList<Conversation> conversations = new ArrayList<>();
         if(mContactCache == null)
-            mContactCache = new SparseArray<>();
+            mContactCache = new LongSparseArray<>();
 
         Cursor cursor = getContext().getContentResolver().query(uri, null, null,
                 null, "date desc");

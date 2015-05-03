@@ -7,6 +7,14 @@ import android.util.Log;
 import com.ioane.sharvadze.geosms.MyPreferencesManager;
 
 /**
+ * Class SyncedWebSms that stays synced.
+ *
+ * Pattern by Ioane Sharvadze.
+ *
+ * This pattern is good for changing object at runtime. So in this option if user changed
+ * web sms in runtime, this object will change inside structure so that webSms will be always
+ * up to date.
+ *
  * Created by Ioane on 3/24/2015.
  */
 public class SyncedWebSms implements WebSms , SharedPreferences.OnSharedPreferenceChangeListener{
@@ -18,7 +26,6 @@ public class SyncedWebSms implements WebSms , SharedPreferences.OnSharedPreferen
     private Context context;
 
     public SyncedWebSms(Context context) {
-        Log.i(TAG,"constructor");
         this.context = context;
         this.webSms = MyPreferencesManager.getWebSmsManager(context);
         SharedPreferences preferences = MyPreferencesManager.getWebSmsPreferences(context);
@@ -27,14 +34,12 @@ public class SyncedWebSms implements WebSms , SharedPreferences.OnSharedPreferen
 
     @Override
     public boolean authenticate() {
-        if(webSms == null) return false;
-        return webSms.authenticate();
+        return webSms != null && webSms.authenticate();
     }
 
     @Override
     public boolean sendSms(String message, String address) {
-        if(webSms == null) return false;
-        return webSms.sendSms(message,address);
+        return webSms != null && webSms.sendSms(message, address);
     }
 
     @Override
