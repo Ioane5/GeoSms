@@ -56,6 +56,7 @@ public class GeoSmsManager {
              * @param params SMS sms, String address,Boolean web
              * @return message resource id.
              */
+            @SuppressWarnings("unchecked")
             @Override
             protected Integer doInBackground(Object... params) {
                 SMS sms = (SMS)params[0];
@@ -67,10 +68,15 @@ public class GeoSmsManager {
 
                 ContentValues values = sms.getContentValues();
                 values.put(Constants.ADDRESS,address);
+                values.put(Constants.THREAD_ID, threadId);
                 Uri insertedSmsURI = context.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
-                Intent sentPI = new Intent(Constants.Actions.MESSAGE_SENT, insertedSmsURI , context.getApplicationContext(), SmsDispatcher.class);
+                Intent sentPI = new Intent(Constants.Actions.MESSAGE_SENT, insertedSmsURI ,
+                        context.getApplicationContext(), SmsDispatcher.class);
                 sentPI.putExtra(Constants.RECIPIENT_IDS, threadId);
+
+
+                // TODO why RECIPIENT_IDS
 
                 if(!web){
                     // send normal sms using GSM.
@@ -78,11 +84,23 @@ public class GeoSmsManager {
 
                     ArrayList<String> dividedMessage = manager.divideMessage(sms.getText());
                     ArrayList<PendingIntent> sentPIs = new ArrayList<>(dividedMessage.size());
-                    for (int i = 0; i < dividedMessage.size() ; i++) {
-                        sentPIs.add(PendingIntent.getBroadcast(context,0,new Intent(sentPI),0));
+                    context.getSharedPreferences(MyPreferencesManager.DELIVERY_REQUEST,Context.MODE_PRIVATE);
+
+                    boolean isDeliveryRequested = MyPreferencesManager.isDeliveryRequested(context);
+
+                    ArrayList<PendingIntent> deliveryPIs = null;
+                    if(isDeliveryRequested){
+                        Intent deliveryPI = new Intent(Constants.Actions.SMS_DELIVERED, insertedSmsURI,
+                                context.getApplicationContext(),SmsDispatcher.class);
+                        deliveryPIs = new ArrayList<>(dividedMessage.size());
+                        for (int i = 0; i < dividedMessage.size() ; i++)
+                            deliveryPIs.add(PendingIntent.getBroadcast(context,0,new Intent(deliveryPI),0));
                     }
+                    for (int i = 0; i < dividedMessage.size() ; i++)
+                        sentPIs.add(PendingIntent.getBroadcast(context,0,new Intent(sentPI),0));
+
                     try{
-                        manager.sendMultipartTextMessage(address, null, dividedMessage, sentPIs, null);
+                        manager.sendMultipartTextMessage(address, null, dividedMessage, sentPIs, deliveryPIs);
                         Log.d(TAG,"sending");
                     }catch (Exception e){
                         Log.e(TAG,"error occured");

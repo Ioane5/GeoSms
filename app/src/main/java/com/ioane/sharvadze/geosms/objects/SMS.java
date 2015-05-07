@@ -12,6 +12,8 @@ import utils.Constants;
 import utils.Constants.MESSAGE;
 
 /**
+ * Class Sms
+ *
  * Created by Ioane on 2/21/2015.
  */
 public class SMS {
@@ -20,7 +22,7 @@ public class SMS {
 
 
 
-    public enum MsgType{SENT,RECEIVED,DRAFT,FAILED,PENDING};
+    public enum MsgType{SENT,RECEIVED,DRAFT,FAILED,PENDING}
 
     private String text;
 
@@ -47,7 +49,7 @@ public class SMS {
             case MESSAGE.MESSAGE_TYPE_OUTBOX:
             case MESSAGE.MESSAGE_TYPE_QUEUED: return MsgType.PENDING;
             case MESSAGE.MESSAGE_TYPE_SENT: return MsgType.SENT;
-            default: return null;
+            default: return MsgType.RECEIVED;
         }
     }
 
@@ -71,14 +73,13 @@ public class SMS {
         this.serviceCenter = serviceCenter;
     }
 
-    public SMS(ContentValues cv){
+    public SMS(ContentValues cv) {
         this.text = cv.getAsString(MESSAGE.BODY);
         this.date = new Date(cv.getAsLong(MESSAGE.DATE));
         this.type = intToMsgType(cv.getAsInteger(MESSAGE.PROTOCOL));
-        this.isRead = cv.getAsInteger(MESSAGE.READ) == 1? true : false;
+        this.isRead = cv.getAsInteger(MESSAGE.READ) == 1;
         Integer temp = cv.getAsInteger(MESSAGE.STATUS);
-        if(temp == null) this.isDelivered = false;
-        else this.isDelivered = temp == 1? true:false;
+        this.isDelivered = temp != null && temp == MESSAGE.STATUS_COMPLETE;
         this.serviceCenter = cv.getAsString(MESSAGE.SERVICE_CENTER);
     }
 
@@ -98,7 +99,7 @@ public class SMS {
         switch (type){
             case RECEIVED:
                 int readInt = cursor.getInt(cursor.getColumnIndex(MESSAGE.READ));
-                isRead = readInt == 1? true : false;
+                isRead = readInt == 1;
                 serviceCenter = cursor.getString(cursor.getColumnIndex(MESSAGE.SERVICE_CENTER));
                 break;
 

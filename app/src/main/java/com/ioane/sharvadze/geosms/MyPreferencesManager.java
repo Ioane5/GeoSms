@@ -22,6 +22,9 @@ public class MyPreferencesManager {
     public static int MAGTIFUN_ID = 1;
     public static int GEOCELL_ID = 191;
 
+    public static String DELIVERY_REQUEST = "request_delivery";
+
+
 
     private static String WEB_PREFS = "WEB_SMS_PREFS";
 
@@ -56,4 +59,8 @@ public class MyPreferencesManager {
         editor.commit();
     }
 
+    public static boolean isDeliveryRequested(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext())
+                .getBoolean(DELIVERY_REQUEST,false);
+    }
 }

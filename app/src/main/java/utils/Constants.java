@@ -58,9 +58,11 @@ public interface Constants {
 
 
     interface Actions{
+        /** Sms delivered to destination */
+        String SMS_DELIVERED = "sms_deliverd_to_Destination";
         String MESSAGE_SENT = "sms_sent";
-        String SMS_RECEIVED= "SMS_RECEIVED";
-        String SMS_DELIVER= "SMS_DELIVER";
+        String SMS_RECEIVED_OLD= "SMS_RECEIVED";
+        String SMS_RECEIVED_NEW = "SMS_DELIVER";
         String RECEIVED_NOTIFICATION_DISMISSED = "received_notification_dismissed";
         String FAILED_NOTIFICATION_DISMISSED = "failed_notification_dismissed";
     }
@@ -132,7 +134,6 @@ public interface Constants {
          */
         String ERROR_CODE = "error_code";
 
-
         /** Type of message */
         String TYPE = "type";
 
@@ -156,6 +157,7 @@ public interface Constants {
 
         /** Message type: queued to send later. */
         int MESSAGE_TYPE_QUEUED = 6;
+
 
     }
 

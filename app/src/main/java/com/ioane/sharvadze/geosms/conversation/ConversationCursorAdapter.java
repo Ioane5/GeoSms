@@ -142,7 +142,11 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
                     break;
                 }
+        }
 
+        if(message.isDelivered()){
+            holder.deliveryStatusView.setText(R.string.sms_delivered);
+            holder.deliveryStatusView.setTextColor(Color.GRAY);
         }
 
         holder.messageView.setText(message.getText());

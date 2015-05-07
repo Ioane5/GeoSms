@@ -32,13 +32,13 @@ import android.widget.ToggleButton;
 
 import com.ioane.sharvadze.geosms.GeoSmsManager;
 import com.ioane.sharvadze.geosms.R;
-import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import broadcastReceivers.SmsDispatcher;
 import utils.Constants;
@@ -243,7 +243,6 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 long threadId = params[0];
                 ContentValues cv =  new ContentValues();
                 cv.put(Constants.MESSAGE.READ,1);
-                ConversationsListUpdater.markAsRead(threadId);
                 getContentResolver().update(Uri.parse("content://sms"),cv , ("thread_id = " + threadId), null);
                 return null;
             }
@@ -303,11 +302,11 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
      */
     private class SendButtonListener implements View.OnClickListener{
 
-        private ArrayList<Contact> contacts;
         private GeoSmsManager smsManager;
+        private List<String> addresses;
 
         public SendButtonListener(ArrayList<Contact> contacts){
-            this.contacts = contacts;
+            addresses = Contact.toAddressArray(contacts);
             smsManager = new GeoSmsManager(getBaseContext());
         }
         @Override
@@ -322,7 +321,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 smsManager.saveDraft(sms);
             }else{
                 SMS sms = new SMS(message,new Date(System.currentTimeMillis()), SMS.MsgType.PENDING,true,false,null);
-                smsManager.sendSms(sms,contacts.get(0).getAddress(),thread_id,isSendWeb());
+                for(String address : addresses)
+                    smsManager.sendSms(sms, address ,thread_id, isSendWeb());
             }
             if (editText.length() > 0) {
                 editText.setText(null);

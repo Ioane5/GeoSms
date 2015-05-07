@@ -14,10 +14,11 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.ioane.sharvadze.geosms.MyNotificationManager;
-import com.ioane.sharvadze.geosms.conversationsList.ConversationsListUpdater;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.ioane.sharvadze.geosms.objects.SMS;
+
+import java.util.Date;
 
 import utils.Constants;
 
@@ -61,17 +62,19 @@ public class SmsDispatcher extends BroadcastReceiver {
 
         if(action == null) return;
         // New versions only listen to SMS_DELIVER.
-        if(Build.VERSION.SDK_INT >= 19 && action.contains(Constants.Actions.SMS_RECEIVED)){
+        if(Build.VERSION.SDK_INT >= 19 && action.contains(Constants.Actions.SMS_RECEIVED_OLD)){
             Log.i(TAG,"action dismissed " +action);
             return;
         }
 
+        if(action.equals(Constants.Actions.SMS_DELIVERED)){
+            handleSmsDelivered(context, intent);
 
-        if(action.equals( Constants.Actions.MESSAGE_SENT)){
+        }else if(action.equals( Constants.Actions.MESSAGE_SENT)){
             handleSmsSend(context, intent);
 
-        }else if(action.contains(Constants.Actions.SMS_DELIVER) ||
-                action.contains(Constants.Actions.SMS_RECEIVED)){
+        }else if(action.contains(Constants.Actions.SMS_RECEIVED_NEW) ||
+                action.contains(Constants.Actions.SMS_RECEIVED_OLD)){
             handleSmsReceive(context, intent);
         }else{
             Log.w(TAG,"unknown action "+action);
@@ -112,7 +115,7 @@ public class SmsDispatcher extends BroadcastReceiver {
             boolean isSummary =  MyNotificationManager.buildSmsReceiveNotification(ctx, contact, sms, builder);
 
             int notif_id = isSummary ? MyNotificationManager.ID_SMS_RECEIVED : (int)threadId;
-            mNotificationManager.notify(notif_id,builder.build());
+            mNotificationManager.notify(notif_id, builder.build());
         }else {
             // if user is on this chat , make no notification , just slight vibration
             values = new ContentValues();
@@ -121,6 +124,25 @@ public class SmsDispatcher extends BroadcastReceiver {
             ctx.getContentResolver().update(smsUri, values,null,null);
             Vibrator v = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
             v.vibrate(VIBRATE_LENGTH);
+        }
+    }
+
+
+    private void handleSmsDelivered(Context ctx, Intent intent){
+        Uri deliveredSmsUri = intent.getData();
+        if(deliveredSmsUri == null){
+            Log.w(TAG,"deliveredSmsUri is null");
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+
+        values.put(Constants.MESSAGE.STATUS, Constants.MESSAGE.STATUS_COMPLETE);
+        try{
+            ctx.getContentResolver().update(deliveredSmsUri,values,null,null);
+        }catch (Exception e){
+            Log.e(TAG,"exception entering delivery report");
+            e.printStackTrace();
         }
     }
 
@@ -136,8 +158,6 @@ public class SmsDispatcher extends BroadcastReceiver {
         ContentValues values = new ContentValues();
 
         long threadId = intent.getLongExtra(Constants.RECIPIENT_IDS,0);
-        if(threadId != 0)
-            ConversationsListUpdater.updateConversation(threadId);
 
         switch (getResultCode()){
             case Activity.RESULT_OK:
@@ -154,5 +174,6 @@ public class SmsDispatcher extends BroadcastReceiver {
             Log.w(TAG,"couldn't update sms! some bug here");
         }
     }
+
 
 }

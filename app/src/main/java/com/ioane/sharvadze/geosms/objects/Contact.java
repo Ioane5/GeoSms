@@ -212,7 +212,7 @@ public class Contact implements Serializable{
      * @param contactList contact list
      * @return address array list
      */
-    public static Collection<String> toAddressArray(ArrayList<Contact> contactList){
+    public static List<String> toAddressArray(ArrayList<Contact> contactList){
         ArrayList<String> address = new ArrayList<>(contactList.size());
         for(Contact contact : contactList){
             address.add(contact.getAddress());

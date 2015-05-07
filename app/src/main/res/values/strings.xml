@@ -50,8 +50,10 @@
     <string name="add_contact_from_external">Add contact from contact picker</string>
     <string name="send_to">Sms to</string>
     <string name="contact">contact</string>
-
-
-
+    <string name="request_delivery">Request Delivery</string>
+    <string name="sending">Sending</string>
+    <string name="websms_pref_category">WebSms</string>
+    <string name="sending_pref_category">Sending</string>
+    <string name="sms_delivered">✓ delivered</string>
 
 </resources>
