@@ -96,6 +96,8 @@ public class SMS {
         int intType = cursor.getInt(cursor.getColumnIndex(MESSAGE.TYPE));
         type = intToMsgType(intType);
 
+        this.isDelivered = cursor.getInt(cursor.getColumnIndex(MESSAGE.STATUS)) == MESSAGE.STATUS_COMPLETE;
+
         switch (type){
             case RECEIVED:
                 int readInt = cursor.getInt(cursor.getColumnIndex(MESSAGE.READ));
