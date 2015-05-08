@@ -201,6 +201,10 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
             if(extras != null){
                 contacts = (ArrayList<Contact>)extras.getSerializable(Constants.CONTACT_DATA);
+                if(contacts != null)
+                    for(Contact c: contacts)
+                        c.resolveContactImage(getBaseContext(),80);
+
                 Long passed_tid = extras.getLong(Constants.THREAD_ID, -1);
                 if(passed_tid == -1 &&  contacts != null){
                     thread_id = Conversation.getOrCreateThreadId(getBaseContext(),
@@ -220,7 +224,9 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 if(!scheme.contains("sms") && !scheme.contains("smsto")) return;
 
                 contacts = new ArrayList<>(1);
-                contacts.add(new Contact(getBaseContext(),schemePart));
+                Contact contact = new Contact(getBaseContext(),schemePart);
+                contact.resolveContactImage(getBaseContext(),80);
+                contacts.add(contact);
             }
             if(contacts == null)
                 return;

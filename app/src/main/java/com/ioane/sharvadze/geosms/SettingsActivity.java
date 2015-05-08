@@ -1,5 +1,8 @@
 package com.ioane.sharvadze.geosms;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -7,6 +10,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class SettingsActivity extends ActionBarActivity {
@@ -33,6 +38,31 @@ public class SettingsActivity extends ActionBarActivity {
         }
     }
 
+    private static void showOpenSourceLicenses(Context context){
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(R.string.open_source_licenses);
+
+        WebView wv = new WebView(context);
+        wv.loadUrl("file:///android_asset/licenses.html");
+
+        wv.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+
+                return true;
+            }
+        });
+
+        alert.setView(wv);
+        alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        alert.show();
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -47,6 +77,17 @@ public class SettingsActivity extends ActionBarActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
+
+
+            Preference licenses = getPreferenceManager().findPreference("open_source_licenses");
+            licenses.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    showOpenSourceLicenses(getActivity());
+                    return true;
+                }
+            });
+
             MyPreferencesManager.getWebSmsPreferences(getActivity().getBaseContext()).
                     registerOnSharedPreferenceChangeListener(this);
 

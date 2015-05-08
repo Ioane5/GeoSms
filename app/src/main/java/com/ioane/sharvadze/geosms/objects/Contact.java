@@ -5,19 +5,20 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.ioane.sharvadze.geosms.R;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import utils.Constants;
 import utils.Utils;
 
 /**
@@ -48,14 +49,8 @@ public class Contact implements Serializable{
         this.photo = photo;
     }
 
-    private static final String[] projection = {
-            ContactsContract.CommonDataKinds.Phone.NUMBER,
-            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-            ContactsContract.CommonDataKinds.Phone.PHOTO_URI
-    };
 
     public static final String ID = "id";
-    public static final String THREAD_ID = "thread_id";
     public static final String NAME = "name";
     public static final String PHOTO = "photo";
     public static final String PHOTO_URI = "photo_uri";
@@ -66,7 +61,11 @@ public class Contact implements Serializable{
         this.name = contactData.getString(NAME);
         this.photoUri =  contactData.getString(PHOTO_URI);
         this.address = contactData.getString(ADDRESS);
-        this.photo = (Bitmap)contactData.getParcelable(PHOTO);
+        try{
+            this.photo = contactData.getParcelable(PHOTO);
+        }catch (ClassCastException e){
+            e.printStackTrace();
+        }
     }
 
     public Contact(Cursor c){
@@ -76,7 +75,7 @@ public class Contact implements Serializable{
     public Bundle getBundle(){
         Bundle bundle = new Bundle();
         bundle.putInt(ID,id);
-        bundle.putString(NAME,name);
+        bundle.putString(NAME, name);
         bundle.putString(PHOTO_URI,photoUri);
         bundle.putString(ADDRESS,address);
         bundle.putParcelable(PHOTO, photo);
@@ -109,7 +108,7 @@ public class Contact implements Serializable{
     }
 
 
-    public Contact(Context context,int recipientId,int threadId){
+    public Contact(Context context,int recipientId){
         setAddress(null);
         setName(null);
         setPhotoUri(null);
@@ -127,14 +126,22 @@ public class Contact implements Serializable{
 
     }
 
-    private Bitmap getPhotoFromURI(String photoURI,Context context) {
-        if(photoURI == null) return null;
-        try {
-            return Utils.getCircleBitmap(Utils.getPhotoFromURI(photoURI,context, Constants.IMAGE_SIZE));
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
+
+    public String getDisplayName(){
+        if(!TextUtils.isEmpty(name))
+            return name;
+        return address;
+    }
+
+    public void resolveContactImage(Context ctx, int size){
+        if(!TextUtils.isEmpty(photoUri)){
+            this.photo = Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri, ctx, size));
+        }else if(!TextUtils.isEmpty(getDisplayName())){
+            this.photo = Utils.createTextBitmap(getDisplayName(),size);
+        }else{
+            this.photo = BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_no_image);
         }
+
     }
 
     public int getId() {
@@ -183,9 +190,7 @@ public class Contact implements Serializable{
         if (o == null || getClass() != o.getClass()) return false;
         Contact contact = (Contact) o;
 
-        if (id != contact.id) return false;
-        if (address != null && !address.equals(contact.getAddress())) return false;
-        return true;
+        return id == contact.id && !(address != null && !address.equals(contact.getAddress()));
     }
 
 

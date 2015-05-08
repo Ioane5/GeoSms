@@ -27,6 +27,7 @@
 
 
 
+
     <item name="theme_msg_color" type="color">#ff4e4e4e</item>
     <item name="themePrimary" type="color">#ff6ca248</item>
     <item name="themeAccent" type="color">#ff83b847</item>
@@ -39,6 +40,9 @@
 
     <color name="transparent" type="color">#00000000</color>
     <color name="themeAccent2">#697cb342</color>
+    <color name="theme_transparent_red">#37ff5722</color>
+    <color name="theme_red">#ffff5722</color>
+
 
     <integer-array name="androidcolors">
         <item>@color/blue</item>

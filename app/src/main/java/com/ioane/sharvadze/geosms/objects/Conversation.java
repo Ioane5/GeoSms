@@ -112,9 +112,10 @@ public class Conversation implements Serializable{
 
         if(cached == null){
             this.contacts = resolveContacts(context,recipientIds);
-        }else{
             // save in cache
             contactCache.append(id,contacts);
+        }else{
+            this.contacts = cached;
         }
 
     }

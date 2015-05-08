@@ -2,14 +2,10 @@ package newConversation;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +20,6 @@ import com.ioane.sharvadze.geosms.objects.Contact;
 import java.util.ArrayList;
 
 import utils.AsyncImageDownloader;
-import utils.Utils;
 
 /**
  * Class ContactsCursorAdapter
@@ -39,8 +34,6 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     private AlphabetIndexer indexer;
 
-    private Bitmap DEFAULT_IMAGE;
-
     private Drawable SELECTED_CONTACT_IMAGE;
 
     private ArrayList<Contact> mSelectedContacts;
@@ -49,27 +42,26 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
 
     public ContactsCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-        DEFAULT_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.ic_no_image);
-        DEFAULT_IMAGE = Utils.getCircleBitmap(DEFAULT_IMAGE);
 
         SELECTED_CONTACT_IMAGE = context.getResources().getDrawable(R.drawable.selected_contact_image);
 
         indexer = new AlphabetIndexer(null, 0 , " ABCDEFGHIJKLMNOPQRTSUVWXYZ0123456789");
         mSelectedContacts = null;
 
-        mImageDownloader = new AsyncImageDownloader(context);
+        mImageDownloader = new AsyncImageDownloader(context, 60);
     }
 
     public void setSelectedContacts(ArrayList<Contact> selectedContacts){
         mSelectedContacts = selectedContacts;
     }
 
+    @SuppressWarnings("unused")
     public void addSelectedContact(Contact contact){
         if(mSelectedContacts != null)
             mSelectedContacts.add(contact);
     }
 
+    @SuppressWarnings("unused")
     public void removeSelectedContact(Contact contact){
         if(mSelectedContacts != null)
             mSelectedContacts.remove(contact);
@@ -158,7 +150,6 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
 
-
         holder.nameView.setText(name);
         holder.phoneKindView.setText(phoneType);
         holder.phoneNumberView.setText(phoneNumber);
@@ -169,15 +160,11 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         if(isSelected(phoneNumber)){
             holder.contactPhotoView.setImageDrawable(SELECTED_CONTACT_IMAGE);
         }else{
-            if(photoUri != null){
-                holder.contactPhotoView.setImageBitmap(null);
-                mImageDownloader.addImage(photoUri,holder.contactPhotoView);
-            }else
-                holder.contactPhotoView.setImageBitmap(DEFAULT_IMAGE);
+            Contact contact = new Contact(name,photoUri,phoneNumber,null);
+
+            holder.contactPhotoView.setImageBitmap(null);
+            mImageDownloader.addImage(contact,holder.contactPhotoView);
         }
-
-
-
     }
 
     @Override
@@ -188,53 +175,6 @@ public class ContactsCursorAdapter extends CursorAdapter implements SectionIndex
         String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
         return new Contact(name,photoUri,phoneNumber,null);
-    }
-
-
-    int cacheSize = 4 * 1024 * 1024; // 4MiB
-    private final LruCache<String,Bitmap> mBitmapCache = new LruCache<String,Bitmap>(cacheSize){
-        protected int sizeOf(String key, Bitmap value){
-            return value.getByteCount();
-        }
-    };
-
-    private void setImage(final ImageView imageView,String photoUri,Context ctx,int pos){
-        synchronized (mBitmapCache) {
-            Bitmap bitmap = mBitmapCache.get(photoUri);
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap);
-                return;
-            }
-        }
-
-        new AsyncTask<Object, Void, Bitmap>() {
-            private ImageView v;
-            private int position;
-
-            @Override
-            protected Bitmap doInBackground(Object... params) {
-                v = (ImageView)params[0];
-                String photoUri = (String)params[1];
-                Context ctx = (Context)params[2];
-                position = (Integer)params[3];
-                Bitmap bitmap = Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri, ctx, 80));
-                synchronized (mBitmapCache) {
-                    mBitmapCache.put(photoUri,bitmap);
-                }
-                return bitmap;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap result) {
-                super.onPostExecute(result);
-                if ((Integer)v.getTag() == position) {
-                    // If this item hasn't been recycled already, hide the
-                    // progress and set and show the image
-                    v.setVisibility(View.VISIBLE);
-                    v.setImageBitmap(result);
-                }
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,imageView,photoUri,ctx,pos);
     }
 
 }

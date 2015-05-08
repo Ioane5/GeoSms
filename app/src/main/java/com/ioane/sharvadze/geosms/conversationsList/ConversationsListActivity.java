@@ -39,10 +39,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
     private final String TAG = ConversationsListActivity.class.getSimpleName();
 
-    private ListView conversationList;
-
     private ArrayAdapter<Conversation> listAdapter;
-
 
 
     /**
@@ -58,10 +55,13 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // if it's default app , it changes layout.
         defaultAppResolve();
 
-        listAdapter = new ConversationsListAdapter(getBaseContext(),
-                R.layout.conversation_item, new ArrayList<Conversation>());
+        ArrayList<Conversation> conversations = Utils.loadConversationsFromCache(getBaseContext());
+        if(conversations == null) conversations = new ArrayList<>();
 
-        conversationList = (ListView) findViewById(R.id.conversations_list_view);
+        listAdapter = new ConversationsListAdapter(getBaseContext(),
+                R.layout.conversation_item, conversations);
+
+        ListView conversationList = (ListView) findViewById(R.id.conversations_list_view);
         conversationList.setAdapter(listAdapter);
         // Listen to clicks
         conversationList.setOnItemClickListener(this);
@@ -139,6 +139,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         listAdapter.clear();
         listAdapter.addAll(data);
         listAdapter.notifyDataSetChanged();
+        Utils.cacheConversations(getBaseContext(), data);
     }
 
     @Override

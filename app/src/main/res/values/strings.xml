@@ -55,5 +55,6 @@
     <string name="websms_pref_category">WebSms</string>
     <string name="sending_pref_category">Sending</string>
     <string name="sms_delivered">✓ delivered</string>
+    <string name="open_source_licenses">Open source licenses</string>
 
 </resources>

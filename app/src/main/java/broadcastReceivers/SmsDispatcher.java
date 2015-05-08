@@ -18,8 +18,6 @@ import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.ioane.sharvadze.geosms.objects.SMS;
 
-import java.util.Date;
-
 import utils.Constants;
 
 /**

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="8dp"
     android:orientation="horizontal"
-    android:background="@drawable/contact_item_background"
+    android:background="@drawable/selectible_item_background"
     >
 
     <ImageView

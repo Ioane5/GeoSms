@@ -4,7 +4,7 @@
 
     tools:context="com.ioane.sharvadze.geosms.conversationsList.ConversationsListActivity"
     android:orientation="vertical"
-    android:background="@color/conversations_list"
+    android:background="@color/transparent"
     >
 
 
@@ -48,6 +48,7 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:headerDividersEnabled="false"
+            android:animateLayoutChanges="true"
             />
 
         <com.melnykov.fab.FloatingActionButton

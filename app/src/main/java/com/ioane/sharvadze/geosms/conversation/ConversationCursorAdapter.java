@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -29,31 +30,33 @@ import utils.Utils;
 public class ConversationCursorAdapter extends CursorAdapter {
 
 
+    @SuppressWarnings("unused")
     private static final  String TAG = ConversationCursorAdapter.class.getSimpleName();
 
     private Contact contact;
 
-    private Bitmap MY_IMAGE;
+    private Bitmap OWNER_IMAGE;
 
     private int receivedMsgCol;
 
-    public ConversationCursorAdapter(Context context, Cursor c, int flags,Contact contact) {
-        super(context, c, flags);
-        this.contact = contact;
-        MY_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.ic_no_image);
-        // make it circle like.
-        MY_IMAGE = Utils.getCircleBitmap(MY_IMAGE);
-        this.receivedMsgCol = context.getResources().getColor(R.color.themeLight);
-    }
 
     public ConversationCursorAdapter(Context context, Cursor c, boolean autoRequery ,Contact contact) {
         super(context, c, autoRequery);
         this.contact = contact;
-        MY_IMAGE = BitmapFactory.decodeResource(context.getResources(),
-                R.mipmap.ic_no_image);
-        // make it circle like.
-        MY_IMAGE = Utils.getCircleBitmap(MY_IMAGE);
+
+        String ownerPhotoUri = Utils.getOwnersImage(context);
+
+
+        if(ContactsContract.Profile.CONTENT_URI == null){
+            OWNER_IMAGE = BitmapFactory.decodeResource(context.getResources(),
+                    R.mipmap.ic_no_image);
+            // make it circle like.
+            OWNER_IMAGE = Utils.getCircleBitmap(OWNER_IMAGE);
+
+        }else{
+            OWNER_IMAGE = Utils.getCircleBitmap(Utils.getPhotoFromURI(ownerPhotoUri,context,60));
+        }
+
         this.receivedMsgCol = context.getResources().getColor(R.color.themeLight);
     }
 
@@ -109,7 +112,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
          */
         if(type != SMS.MsgType.RECEIVED && (nextSms == null || nextSms.getMsgType() == SMS.MsgType.RECEIVED)){
             holder.nameView.setText(R.string.me);
-            holder.photo.setImageBitmap(MY_IMAGE);
+            holder.photo.setImageBitmap(OWNER_IMAGE);
             holder.photo.setVisibility(View.VISIBLE);
         }
 

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,8 +17,7 @@ import android.widget.ListView;
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Class ConversationsListCAB
@@ -35,6 +32,7 @@ public class ConversationsListCAB {
 
     private ArrayAdapter<Conversation> listAdapter;
 
+    @SuppressWarnings("unused")
     private static final String TAG = ConversationsListCAB.class.getSimpleName();
 
     private AlertDialog.Builder builder;
@@ -47,15 +45,23 @@ public class ConversationsListCAB {
         this.builder = builder;
     }
 
+    // TODO class destroys on rotate, also reference on context.
+    // TODO implement this in conversationsList! SHORT IMPLEMENTATION!
     private class MyCABListenter implements AbsListView.MultiChoiceModeListener{
 
-        SparseBooleanArray checkedItems = new SparseBooleanArray();
+        private  HashMap<Integer,Boolean> checkedItems = new HashMap<>();
+
 
         @Override
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
             // Here you can do something when items are selected/de-selected,
             // such as update the title in the CAB
-            checkedItems.put(position, checked);
+            if(!checked && checkedItems.containsKey(position))
+                checkedItems.remove(position);
+            else if(checked)
+                checkedItems.put(position, true);
+
+            mode.setTitle(String.format("Selected %d" ,checkedItems.size()));
         }
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -81,36 +87,22 @@ public class ConversationsListCAB {
                     builder.setMessage(size == 1? R.string.delete_warning_msg_single :
                             R.string.delete_warning_msg_plural);
                     builder.setPositiveButton("YES", new DatePickerDialog.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialog, final int which) {
                             new AsyncTask<Void,Void,Void>(){
                                 @Override
                                 protected Void doInBackground(Void... params) {
-                                    Log.i(TAG,"doInBakground " + checkedItems.size());
-                                    for(int i=0;i<checkedItems.size();i++){
-                                        if(checkedItems.valueAt(i)){
-                                            int key = checkedItems.keyAt(i);
-                                            long threadId = listAdapter.getItem(key).getId();
-                                            Log.i(TAG,"deleting threadId = "  + threadId);
-                                            context.getContentResolver().delete(
-                                                    Uri.parse("content://mms-sms/conversations"),
-                                                    "thread_id=?", new String[] {Long.toString(threadId)});
-                                        }
+                                    for (Integer toDelete : checkedItems.keySet()) {
+                                        long threadId = listAdapter.getItem(toDelete).getId();
+                                        context.getContentResolver().delete(
+                                                Uri.parse("content://mms-sms/conversations"),
+                                                "thread_id=?", new String[]{Long.toString(threadId)});
                                     }
+
                                     return null;
                                 }
                                 @Override
                                 protected void onPostExecute(Void aVoid) {
                                     super.onPostExecute(aVoid);
-                                    Log.i(TAG,"now in OpPostExecute");
-                                    List<Conversation> toDel = new ArrayList<>();
-                                    for(int i=0;i<checkedItems.size();i++){
-                                        if(checkedItems.valueAt(i)){
-                                            int key = checkedItems.keyAt(i);
-                                            toDel.add(listAdapter.getItem(key));
-                                        }
-                                    }
-                                    for(Conversation conversation:toDel)
-                                        listAdapter.remove(conversation);
                                     checkedItems.clear();
                                 }
                             }.execute();

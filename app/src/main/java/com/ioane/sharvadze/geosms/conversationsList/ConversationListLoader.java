@@ -6,6 +6,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.util.LongSparseArray;
+import android.util.Log;
 
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
@@ -185,11 +186,13 @@ public class ConversationListLoader extends AsyncTaskLoader<ArrayList<Conversati
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
+            Log.i("onChange","changed");
             conversationLoader.onContentChanged();
         }
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
+            Log.i("onChange","changed " + uri);
             super.onChange(selfChange, uri);
         }
     }

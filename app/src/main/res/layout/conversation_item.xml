@@ -3,8 +3,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/selected_conversation"
     android:padding="12dp"
+    android:background="@drawable/selectible_item_background"
     >
 
     <ImageView
@@ -16,7 +16,8 @@
         android:layout_marginTop="2dp"
         android:drawingCacheQuality="low"
         android:id="@+id/contact_picture_image_view"
-        android:onClick="onContactImageClick"/>
+        android:onClick="onContactImageClick"
+       />
 
 
     <LinearLayout
@@ -38,12 +39,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/conversation_user_name"
+                android:singleLine="true"
                 />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
+
             <TextView
                 android:textAllCaps="true"
                 android:textSize="10sp"
@@ -57,7 +60,7 @@
 
 
         <TextView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:textSize="12sp"
             android:textColor="@color/conversation_last_msg"
             android:textStyle="italic"
