@@ -3,17 +3,25 @@ package com.ioane.sharvadze.geosms.conversationsList;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.LoaderManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -26,8 +34,12 @@ import com.ioane.sharvadze.geosms.conversation.ConversationActivity;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.melnykov.fab.FloatingActionButton;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.listeners.ActionClickListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import newConversation.NewConversationActivity;
 import utils.Constants;
@@ -41,6 +53,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
     private ArrayAdapter<Conversation> listAdapter;
 
+    private ListView mListView;
 
     /**
      * This int is just to
@@ -61,15 +74,15 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         listAdapter = new ConversationsListAdapter(getBaseContext(),
                 R.layout.conversation_item, conversations);
 
-        ListView conversationList = (ListView) findViewById(R.id.conversations_list_view);
-        conversationList.setAdapter(listAdapter);
+        mListView = (ListView) findViewById(R.id.conversations_list_view);
+        mListView.setAdapter(listAdapter);
         // Listen to clicks
-        conversationList.setOnItemClickListener(this);
+        mListView.setOnItemClickListener(this);
         // listen for conversation updates
-        initMultiChoiceListView(conversationList);
+        initMultiChoiceListView();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.attachToListView(conversationList);
+        fab.attachToListView(mListView);
 
         MyNotificationManager.clearNotifications(getBaseContext());
 
@@ -173,9 +186,78 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         startActivity(i);
     }
 
-    private void initMultiChoiceListView(ListView listView) {
-        new ConversationsListCAB(getApplicationContext(), listView, listAdapter,
-                new AlertDialog.Builder(ConversationsListActivity.this));
+    private void initMultiChoiceListView() {
+        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                mode.setTitle(String.format("Selected %d", mListView.getCheckedItemCount()));
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.conversations_list_cab, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_delete:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ConversationsListActivity.this);
+
+                        SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
+                        final List<Integer> checkedIds = new ArrayList<>(checkedItemPositions.size());
+
+                        for (int i = 0; i < checkedItemPositions.size(); i++)
+                            if (checkedItemPositions.get(checkedItemPositions.keyAt(i)))
+                                checkedIds.add(checkedItemPositions.keyAt(i));
+
+
+                        builder.setTitle(R.string.warning);
+                        builder.setMessage(checkedIds.size() == 1 ? R.string.delete_warning_msg_single :
+                                R.string.delete_warning_msg_plural);
+                        builder.setPositiveButton("YES", new DatePickerDialog.OnClickListener() {
+                            public void onClick(DialogInterface dialog, final int which) {
+                                ArrayList<Conversation> deleteList = new ArrayList<>(checkedIds.size());
+                                for (long id : checkedIds) {
+                                    Conversation toDelete = listAdapter.getItem((int) id);
+                                    deleteList.add(toDelete);
+                                    listAdapter.remove(toDelete);
+                                }
+                                listAdapter.notifyDataSetChanged();
+                                new AsyncUndoDelete(deleteList, Constants.UNDO_TIME, checkedIds).execute();
+                                mode.finish();
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mode.finish();
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
     }
 
     public void onContactImageClick(View v) {
@@ -208,6 +290,70 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_conversation_list, menu);
         return true;
+    }
+
+    private class AsyncUndoDelete extends AsyncTask<Void,Void,Boolean>{
+
+        ArrayList<Conversation> mToDeleteList;
+        int mSecondsToWait;
+        List<Integer> mIndexes;
+
+        /**
+         * @param toDeleteList list to delete if not undo.
+         * @param secondsToWait how many seconds to wait.
+         */
+        public AsyncUndoDelete(ArrayList<Conversation> toDeleteList,int secondsToWait,List<Integer> indexes){
+            mToDeleteList = toDeleteList;
+            mSecondsToWait = secondsToWait;
+            mIndexes = indexes;
+        }
+
+        private void restore(){
+            for(int i=0;i<mIndexes.size();i++){
+                listAdapter.insert(mToDeleteList.get(i),mIndexes.get(i));
+            }
+            listAdapter.notifyDataSetChanged();
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            String text = getResources().getString(R.string.conversations_deleted);
+
+            SnackbarManager.show(
+                    Snackbar.with(getApplicationContext())
+                        .text(String.format("%d %s", mToDeleteList.size(), text))
+                        .actionLabel(R.string.undo).actionColorResource(R.color.themePrimary)
+                        .actionListener(new ActionClickListener() {
+                            @Override
+                            public void onActionClicked(Snackbar snackbar) {
+                                cancel(false);
+                                restore();
+                            }
+                        })
+                    ,ConversationsListActivity.this );
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                Thread.sleep(mSecondsToWait * 1000);
+                if(isCancelled())
+                    return false;
+            } catch (InterruptedException e) {
+                return false;
+            }
+            for(Conversation toDelete: mToDeleteList){
+                getContentResolver().delete(
+                        Uri.parse("content://mms-sms/conversations"),
+                        "thread_id=?", new String[]{Long.toString(toDelete.getId())});
+            }
+            return true;
+        }
+
+
     }
 
 }

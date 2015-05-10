@@ -56,5 +56,7 @@
     <string name="sending_pref_category">Sending</string>
     <string name="sms_delivered">✓ delivered</string>
     <string name="open_source_licenses">Open source licenses</string>
+    <string name="undo">undo</string>
+    <string name="conversations_deleted">conversations deleted</string>
 
 </resources>

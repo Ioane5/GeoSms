@@ -46,6 +46,7 @@ public class AsyncImageDownloader {
     }
 
     public void addImage(Contact contact, ImageView imageView){
+        imageView.setImageBitmap(null); // set null before setting new image.
         String uri = contact.getPhotoUri();
 
         ImageInfo task = new ImageInfo();

@@ -55,6 +55,8 @@ public interface Constants {
             ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
 
+    /** How many seconds wait before delete */
+    int UNDO_TIME = 5;
 
 
     interface Actions{

@@ -49,6 +49,7 @@
             android:dividerHeight="0dp"
             android:headerDividersEnabled="false"
             android:animateLayoutChanges="true"
+            android:choiceMode="multipleChoiceModal"
             />
 
         <com.melnykov.fab.FloatingActionButton
