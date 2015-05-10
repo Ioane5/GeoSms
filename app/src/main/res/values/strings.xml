@@ -58,5 +58,10 @@
     <string name="open_source_licenses">Open source licenses</string>
     <string name="undo">undo</string>
     <string name="conversations_deleted">conversations deleted</string>
+    <string name="selected">selected</string>
+    <string name="send_as_new">Send as new</string>
+    <string name="copy">Copy</string>
+    <string name="details">Details</string>
+    <string name="info">Info</string>
 
 </resources>

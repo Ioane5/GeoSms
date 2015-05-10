@@ -1,7 +1,10 @@
 package com.ioane.sharvadze.geosms.conversation;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -17,12 +20,16 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -61,6 +68,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
     private static boolean isKeyboardVisible = false;
 
+    private GeoSmsManager smsManager;
+
     /** If user changed toggle, we set as true */
     private boolean userChangedWebToggle = false;
     private ImageButton button;
@@ -72,6 +81,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
 
+        smsManager = new GeoSmsManager(getBaseContext());
         webUseToggle = (ToggleButton)findViewById(R.id.use_web_toggle_button);
         button = (ImageButton)findViewById(R.id.send_button);
         button.setEnabled(false);
@@ -89,7 +99,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
             return;
         }
 
-        button.setOnClickListener(new SendButtonListener(contacts));
+        button.setOnClickListener(new SendButtonListener());
 
         setTitle(Utils.getChatHeader(contacts));
 
@@ -127,10 +137,103 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 }
             });
         }
+        initCab();
         initKeyboardListener();
         startLoader();
     }
 
+    /*
+    * Initializes context action bar.
+    */
+    private void initCab(){
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                mode.setTitle(String.format("%d", listView.getCheckedItemCount()));
+                mode.invalidate();
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.conversation_cab, menu);
+                return true;
+            }
+
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                if (listView.getCheckedItemCount() == 1){
+                    // single choice
+                    MenuItem item = menu.findItem(R.id.action_details);
+                    item.setVisible(true);
+                    return true;
+                } else {
+                    // multi choice.
+                    MenuItem item = menu.findItem(R.id.action_details);
+                    item.setVisible(false);
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+                SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
+                final List<SMS> smsList = new ArrayList<>(checkedItemPositions.size());
+
+                for (int i = 0; i < checkedItemPositions.size(); i++){
+                    int pos = checkedItemPositions.keyAt(i);
+                    if (checkedItemPositions.get(pos))
+                        smsList.add(new SMS((Cursor)adapter.getItem(pos)));
+                }
+
+                if(smsList.isEmpty())
+                    return false;
+
+                switch (item.getItemId()){
+                    case R.id.action_copy:
+                        ClipboardManager clipboardManager = (ClipboardManager)
+                                getSystemService(CLIPBOARD_SERVICE);
+
+                        StringBuilder strBuilder = new StringBuilder();
+                        for(SMS sms : smsList){
+                            strBuilder.append(sms.getText());
+                        }
+                        ClipData clip = ClipData.newPlainText("sms",strBuilder.toString());
+                        clipboardManager.setPrimaryClip(clip);
+                        break;
+                    case R.id.action_send_as_new:
+                        for (SMS sms : smsList)
+                            sendMessage(sms);
+                        break;
+                    case R.id.action_details:
+                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ConversationActivity.this);
+                        alertBuilder.setTitle(R.string.info)
+                            .setMessage(smsList.get(0).textReference());
+                        alertBuilder.setCancelable(true);
+                        alertBuilder.show();
+                        break;
+                    case R.id.action_delete:
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Utils.deleteSmsList(getBaseContext(),smsList);
+                            }
+                        }).start();
+                        break;
+                    default:
+                        return false;
+                }
+                mode.finish();
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+            }
+        });
+    }
     /**
      * This method inits loader when thread_id is resolved.
      */
@@ -227,6 +330,8 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 Contact contact = new Contact(getBaseContext(),schemePart);
                 contact.resolveContactImage(getBaseContext(),80);
                 contacts.add(contact);
+                thread_id = Conversation.getOrCreateThreadId(getBaseContext(),
+                        Contact.toAddressArray(contacts));
             }
             if(contacts == null)
                 return;
@@ -302,19 +407,16 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
         return webUseToggle.isChecked();
     }
 
+    private void sendMessage(SMS sms){
+        for(String address : Contact.toAddressArray(contacts))
+            smsManager.sendSms(sms, address ,thread_id, isSendWeb());
+    }
 
     /**
      * Class for managing clicked send button.
      */
     private class SendButtonListener implements View.OnClickListener{
 
-        private GeoSmsManager smsManager;
-        private List<String> addresses;
-
-        public SendButtonListener(ArrayList<Contact> contacts){
-            addresses = Contact.toAddressArray(contacts);
-            smsManager = new GeoSmsManager(getBaseContext());
-        }
         @Override
         public void onClick(View view) {
             EditText editText = (EditText)findViewById(R.id.enter_message_edit_text);
@@ -327,8 +429,7 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 smsManager.saveDraft(sms);
             }else{
                 SMS sms = new SMS(message,new Date(System.currentTimeMillis()), SMS.MsgType.PENDING,true,false,null);
-                for(String address : addresses)
-                    smsManager.sendSms(sms, address ,thread_id, isSendWeb());
+                sendMessage(sms);
             }
             if (editText.length() > 0) {
                 editText.setText(null);

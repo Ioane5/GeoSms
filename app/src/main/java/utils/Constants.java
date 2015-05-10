@@ -1,5 +1,6 @@
 package utils;
 
+import android.net.Uri;
 import android.provider.ContactsContract;
 
 /**
@@ -10,6 +11,10 @@ import android.provider.ContactsContract;
  */
 @SuppressWarnings("unused")
 public interface Constants {
+
+    interface URIS{
+        Uri SMS = Uri.parse("content://sms");
+    }
 
     int IMAGE_SIZE = 90;
 
@@ -83,6 +88,7 @@ public interface Constants {
          */
         String STATUS = "status";
 
+
         int STATUS_NONE = -1;
         int STATUS_COMPLETE = 0;
         int STATUS_PENDING = 32;
@@ -92,18 +98,19 @@ public interface Constants {
 
         String READ = "read";
 
+        String ID = "_id";
 
         /**
          * The date the message was received.
          * <P>Type: INTEGER (long)</P>
          */
-        public static final String DATE = "date";
+        String DATE = "date";
 
         /**
          * The date the message was sent.
          * <P>Type: INTEGER (long)</P>
          */
-        public static final String DATE_SENT = "date_sent";
+        String DATE_SENT = "date_sent";
 
         /**
          * The subject of the message, if present

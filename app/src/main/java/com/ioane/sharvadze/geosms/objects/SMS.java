@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import utils.Constants;
@@ -13,7 +14,7 @@ import utils.Constants.MESSAGE;
 
 /**
  * Class Sms
- *
+ * <p/>
  * Created by Ioane on 2/21/2015.
  */
 public class SMS {
@@ -21,10 +22,11 @@ public class SMS {
     private static final String TAG = SMS.class.getSimpleName();
 
 
-
-    public enum MsgType{SENT,RECEIVED,DRAFT,FAILED,PENDING}
+    public enum MsgType {SENT, RECEIVED, DRAFT, FAILED, PENDING}
 
     private String text;
+
+    private int id;
 
     /**
      * If msg if from me date is date sent.
@@ -39,27 +41,38 @@ public class SMS {
     private boolean isDelivered;
 
     private String serviceCenter;
-    
-    private MsgType intToMsgType(int intType){
-        switch (intType){
+
+    private MsgType intToMsgType(int intType) {
+        switch (intType) {
             case MESSAGE.MESSAGE_TYPE_ALL:
-            case MESSAGE.MESSAGE_TYPE_INBOX: return MsgType.RECEIVED;
-            case MESSAGE.MESSAGE_TYPE_DRAFT: return MsgType.DRAFT;
-            case MESSAGE.MESSAGE_TYPE_FAILED: return MsgType.FAILED;
+            case MESSAGE.MESSAGE_TYPE_INBOX:
+                return MsgType.RECEIVED;
+            case MESSAGE.MESSAGE_TYPE_DRAFT:
+                return MsgType.DRAFT;
+            case MESSAGE.MESSAGE_TYPE_FAILED:
+                return MsgType.FAILED;
             case MESSAGE.MESSAGE_TYPE_OUTBOX:
-            case MESSAGE.MESSAGE_TYPE_QUEUED: return MsgType.PENDING;
-            case MESSAGE.MESSAGE_TYPE_SENT: return MsgType.SENT;
-            default: return MsgType.RECEIVED;
+            case MESSAGE.MESSAGE_TYPE_QUEUED:
+                return MsgType.PENDING;
+            case MESSAGE.MESSAGE_TYPE_SENT:
+                return MsgType.SENT;
+            default:
+                return MsgType.RECEIVED;
         }
     }
 
-    private int msgTypeToInt(MsgType type){
-        switch (type){
-            case RECEIVED: return  MESSAGE.MESSAGE_TYPE_INBOX;
-            case DRAFT: return  MESSAGE.MESSAGE_TYPE_DRAFT;
-            case FAILED: return  MESSAGE.MESSAGE_TYPE_FAILED;
-            case PENDING: return MESSAGE.MESSAGE_TYPE_OUTBOX;
-            case SENT: return MESSAGE.MESSAGE_TYPE_SENT;
+    private int msgTypeToInt(MsgType type) {
+        switch (type) {
+            case RECEIVED:
+                return MESSAGE.MESSAGE_TYPE_INBOX;
+            case DRAFT:
+                return MESSAGE.MESSAGE_TYPE_DRAFT;
+            case FAILED:
+                return MESSAGE.MESSAGE_TYPE_FAILED;
+            case PENDING:
+                return MESSAGE.MESSAGE_TYPE_OUTBOX;
+            case SENT:
+                return MESSAGE.MESSAGE_TYPE_SENT;
         }
         return MESSAGE.MESSAGE_TYPE_ALL;
     }
@@ -83,10 +96,10 @@ public class SMS {
         this.serviceCenter = cv.getAsString(MESSAGE.SERVICE_CENTER);
     }
 
-    public SMS(Cursor cursor){
+    public SMS(Cursor cursor) {
         int protocol = cursor.getInt(cursor.getColumnIndex(MESSAGE.PROTOCOL));
-        if(protocol != MESSAGE.SMS_PROTOCOL){
-            Log.w(TAG,"this message is not SMS");
+        if (protocol != MESSAGE.SMS_PROTOCOL) {
+            Log.w(TAG, "this message is not SMS");
             return;
         }
 
@@ -98,7 +111,7 @@ public class SMS {
 
         this.isDelivered = cursor.getInt(cursor.getColumnIndex(MESSAGE.STATUS)) == MESSAGE.STATUS_COMPLETE;
 
-        switch (type){
+        switch (type) {
             case RECEIVED:
                 int readInt = cursor.getInt(cursor.getColumnIndex(MESSAGE.READ));
                 isRead = readInt == 1;
@@ -111,6 +124,14 @@ public class SMS {
                 break;
         }
 
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getServiceCenter() {
@@ -163,7 +184,7 @@ public class SMS {
 
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
-        values.put(MESSAGE.PROTOCOL,MESSAGE.SMS_PROTOCOL);
+        values.put(MESSAGE.PROTOCOL, MESSAGE.SMS_PROTOCOL);
         values.put(MESSAGE.BODY, this.getText());
         values.put(MESSAGE.DATE, this.getDate().getTime());
         values.put(MESSAGE.READ, this.isRead());
@@ -173,31 +194,37 @@ public class SMS {
     }
 
 
-    public static ContentValues getContentValuesFromBundle(Bundle bundle){
+    public static ContentValues getContentValuesFromBundle(Bundle bundle) {
         ContentValues cv = new ContentValues();
 
         Object[] pdus = (Object[]) bundle.get("pdus");
-        if(pdus == null || pdus.length <= 0)
+        if (pdus == null || pdus.length <= 0)
             return null;
         SmsMessage[] msgs = new SmsMessage[pdus.length];
         StringBuilder messageText = new StringBuilder();
-        for (int i=0; i<pdus.length; i++){
-            msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+        for (int i = 0; i < pdus.length; i++) {
+            msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
             messageText.append(msgs[i].getMessageBody());
         }
         msgs[0].getUserData();
 
-        cv.put(Constants.ADDRESS,msgs[0].getOriginatingAddress());
-        cv.put(MESSAGE.BODY,messageText.toString());
-        cv.put(MESSAGE.PROTOCOL,msgs[0].getProtocolIdentifier());
-        cv.put(MESSAGE.TYPE,MESSAGE.MESSAGE_TYPE_INBOX);
-        cv.put(MESSAGE.SUBJECT,msgs[0].getPseudoSubject());
+        cv.put(Constants.ADDRESS, msgs[0].getOriginatingAddress());
+        cv.put(MESSAGE.BODY, messageText.toString());
+        cv.put(MESSAGE.PROTOCOL, msgs[0].getProtocolIdentifier());
+        cv.put(MESSAGE.TYPE, MESSAGE.MESSAGE_TYPE_INBOX);
+        cv.put(MESSAGE.SUBJECT, msgs[0].getPseudoSubject());
         cv.put(MESSAGE.SERVICE_CENTER, msgs[0].getServiceCenterAddress());
         cv.put(MESSAGE.READ, 0); // isn't read
-        cv.put(MESSAGE.DATE,msgs[0].getTimestampMillis());
+        cv.put(MESSAGE.DATE, msgs[0].getTimestampMillis());
         cv.put(MESSAGE.ERROR_CODE, msgs[0].getStatus());
 
         return cv;
     }
 
+
+    public String textReference() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm"); //called without pattern
+        return "service center = " + getServiceCenter() + "\n" +
+                "date = " + (getDate() == null ? "NULL" : df.format(getDate()));
+    }
 }

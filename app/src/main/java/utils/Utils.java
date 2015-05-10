@@ -20,6 +20,7 @@ import android.util.Log;
 
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
+import com.ioane.sharvadze.geosms.objects.SMS;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class Utils
@@ -50,6 +52,7 @@ public class Utils {
     public static void cacheConversations(Context context, ArrayList<Conversation> conversations){
         new Thread(new AsyncConversationCacher(context,conversations)).start();
     }
+
 
     private static class AsyncConversationCacher implements Runnable{
 
@@ -162,7 +165,7 @@ public class Utils {
 
     public static String getOwnersImage(Context context){
         Cursor cursor = context.getContentResolver().query(ContactsContract.Profile.CONTENT_URI,
-                new String[]{ContactsContract.Profile.PHOTO_URI},null,null,null);
+                new String[]{ContactsContract.Profile.PHOTO_URI}, null, null, null);
 
         if(cursor != null){
             String uri = null;
@@ -217,6 +220,12 @@ public class Utils {
 
 
 
+    public static void deleteSmsList(Context context,List<SMS> smsList) {
+        for(SMS sms:smsList){
+            context.getContentResolver().delete(Constants.URIS.SMS,"_id=?",
+                    new String[]{""+sms.getId()});
+        }
+    }
 
 
 

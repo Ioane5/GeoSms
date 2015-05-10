@@ -191,8 +191,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                mode.setTitle(String.format("Selected %d", mListView.getCheckedItemCount()));
-
+                final String text = getResources().getString(R.string.selected);
+                mode.setTitle(String.format("%s %d" , text, mListView.getCheckedItemCount()));
             }
 
             @Override
