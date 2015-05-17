@@ -37,6 +37,7 @@ import com.melnykov.fab.FloatingActionButton;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.nispok.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,8 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     private ArrayAdapter<Conversation> listAdapter;
 
     private ListView mListView;
+
+    private FloatingActionButton fab;
 
     /**
      * This int is just to
@@ -81,8 +84,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
         // listen for conversation updates
         initMultiChoiceListView();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.attachToListView(mListView);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         MyNotificationManager.clearNotifications(getBaseContext());
 
@@ -233,7 +235,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                                     listAdapter.remove(toDelete);
                                 }
                                 listAdapter.notifyDataSetChanged();
-                                new AsyncUndoDelete(deleteList, Constants.UNDO_TIME, checkedIds).execute();
+                                new AsyncUndoDelete(deleteList, checkedIds).execute();
                                 mode.finish();
                                 dialog.dismiss();
                             }
@@ -295,16 +297,13 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
     private class AsyncUndoDelete extends AsyncTask<Void,Void,Boolean>{
 
         ArrayList<Conversation> mToDeleteList;
-        int mSecondsToWait;
         List<Integer> mIndexes;
 
         /**
          * @param toDeleteList list to delete if not undo.
-         * @param secondsToWait how many seconds to wait.
          */
-        public AsyncUndoDelete(ArrayList<Conversation> toDeleteList,int secondsToWait,List<Integer> indexes){
+        public AsyncUndoDelete(ArrayList<Conversation> toDeleteList, List<Integer> indexes){
             mToDeleteList = toDeleteList;
-            mSecondsToWait = secondsToWait;
             mIndexes = indexes;
         }
 
@@ -322,24 +321,43 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
 
             String text = getResources().getString(R.string.conversations_deleted);
 
-            SnackbarManager.show(
-                    Snackbar.with(getApplicationContext())
-                        .text(String.format("%d %s", mToDeleteList.size(), text))
-                        .actionLabel(R.string.undo).actionColorResource(R.color.themePrimary)
-                        .actionListener(new ActionClickListener() {
-                            @Override
-                            public void onActionClicked(Snackbar snackbar) {
-                                cancel(false);
-                                restore();
-                            }
-                        })
-                    ,ConversationsListActivity.this );
+            Snackbar snackbar = Snackbar.with(getApplicationContext())
+                    .eventListener(new EventListener() {
+                        @Override
+                        public void onShow(Snackbar snackbar) {
+                            fab.animate().translationYBy(-snackbar.getHeight());
+                        }
+                        @Override
+                        public void onShowByReplace(Snackbar snackbar) {}
+                        @Override
+                        public void onShown(Snackbar snackbar) {}
+                        @Override
+                        public void onDismiss(Snackbar snackbar) {}
+                        @Override
+                        public void onDismissByReplace(Snackbar snackbar) {}
+                        @Override
+                        public void onDismissed(Snackbar snackbar) {
+                            fab.animate().translationYBy(snackbar.getHeight());
+                        }
+                    })
+                    .text(String.format("%d %s", mToDeleteList.size(), text))
+                    .actionLabel(R.string.undo).actionColorResource(R.color.themePrimary)
+                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                    .actionListener(new ActionClickListener() {
+                        @Override
+                        public void onActionClicked(Snackbar snackbar) {
+                            cancel(false);
+                            restore();
+                        }
+                    });
+
+            SnackbarManager.show(snackbar, ConversationsListActivity.this);
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                Thread.sleep(mSecondsToWait * 1000);
+                Thread.sleep(3500);
                 if(isCancelled())
                     return false;
             } catch (InterruptedException e) {
