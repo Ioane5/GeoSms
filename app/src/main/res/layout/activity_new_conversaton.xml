@@ -5,9 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:divider="@drawable/divider"
     android:showDividers="middle"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
@@ -18,7 +16,6 @@
         android:textColor="@color/white"
         android:layout_gravity="center"
         android:id="@+id/empty_chosen_contact_view"
-        android:background="@color/themeAccent2"
         />
 
     <GridView

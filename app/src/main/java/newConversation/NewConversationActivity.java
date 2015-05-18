@@ -1,7 +1,6 @@
 package newConversation;
 
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -15,6 +14,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.InputType;

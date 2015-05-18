@@ -1,7 +1,9 @@
 package utils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,8 +18,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
+import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.QuickContactBadge;
 
+import com.ioane.sharvadze.geosms.R;
+import com.ioane.sharvadze.geosms.conversation.ContactsArrayAdapter;
 import com.ioane.sharvadze.geosms.objects.Contact;
 import com.ioane.sharvadze.geosms.objects.Conversation;
 import com.ioane.sharvadze.geosms.objects.SMS;
@@ -42,6 +51,56 @@ public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
 
     private static final String CONTACT_LIST_FILE = "file_contact_list";
+
+
+
+    public static AppCompatDialog buildContactsDialog(final Context context, final ArrayList<Contact> contacts){
+        AppCompatDialog dialog = new AppCompatDialog(context);
+        dialog.setContentView(R.layout.activity_conversation_people);
+
+        dialog.setTitle(R.string.people_in_this_conversation);
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+            }
+        });
+
+        final ContactsArrayAdapter contactsAdapter = new ContactsArrayAdapter(context,R.layout.contact_item);
+        contactsAdapter.addAll(contacts);
+        ListView listView = (ListView)dialog.findViewById(R.id.people_list);
+        listView.setAdapter(contactsAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Contact contact = contacts.get(position);
+                // show contact badge if person was clicked.
+                if (contact.getId() > 0) {
+                    Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
+                    ContactsContract.QuickContact.showQuickContact(context,
+                            ((Activity)context).findViewById(R.id.quick_contact), uri,
+                            ContactsContract.QuickContact.MODE_MEDIUM, null);
+                } else {
+                    QuickContactBadge badge = (QuickContactBadge) ((Activity)context).findViewById(R.id.quick_contact);
+                    badge.assignContactFromPhone(contact.getAddress(), true);
+                    badge.setMode(ContactsContract.QuickContact.MODE_MEDIUM);
+                    badge.performClick();
+                }
+            }
+        });
+
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+            }
+        });
+        return dialog;
+    }
+
 
     /**
      * Saves Conversation list asynchronously
@@ -109,7 +168,7 @@ public class Utils {
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.parseColor("#ff83b847"));
+        paint.setColor(Color.parseColor("#FBC02D"));
 
         Paint textPaint = new Paint();
         Rect textBounds = new Rect();

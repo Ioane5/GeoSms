@@ -2,7 +2,6 @@ package com.ioane.sharvadze.geosms.conversationsList;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager;
 import android.content.DialogInterface;
@@ -13,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -232,8 +232,12 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                                 for (long id : checkedIds) {
                                     Conversation toDelete = listAdapter.getItem((int) id);
                                     deleteList.add(toDelete);
+                                }
+                                // than delete conversations
+                                for(Conversation toDelete : deleteList){
                                     listAdapter.remove(toDelete);
                                 }
+
                                 listAdapter.notifyDataSetChanged();
                                 new AsyncUndoDelete(deleteList, checkedIds).execute();
                                 mode.finish();
@@ -341,7 +345,7 @@ public class ConversationsListActivity extends MyActivity implements AdapterView
                         }
                     })
                     .text(String.format("%d %s", mToDeleteList.size(), text))
-                    .actionLabel(R.string.undo).actionColorResource(R.color.themePrimary)
+                    .actionLabel(R.string.undo).actionColorResource(R.color.themeAccent)
                     .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
                     .actionListener(new ActionClickListener() {
                         @Override

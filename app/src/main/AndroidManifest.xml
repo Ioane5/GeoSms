@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ioane.sharvadze.geosms" >
 
-
-
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
@@ -15,32 +13,30 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/CustomActionBarTheme" >
-
         <receiver
             android:name="broadcastReceivers.SmsDispatcher"
-            android:permission="android.permission.BROADCAST_SMS"
-            android:enabled="true">
+            android:enabled="true"
+            android:permission="android.permission.BROADCAST_SMS" >
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
-            <intent-filter android:priority="10000">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+            <intent-filter android:priority="10000" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="sms_sent" />
             </intent-filter>
         </receiver>
 
-
         <!-- BroadcastReceiver that listens for Our Notifications -->
-        <receiver android:name=".MyNotificationManager"
-            android:exported="false">
+        <receiver
+            android:name=".MyNotificationManager"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="notification_dismissed" />
             </intent-filter>
@@ -110,11 +106,10 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
-
         <activity
             android:name="newConversation.NewConversationActivity"
-            android:parentActivityName=".conversationsList.ConversationsListActivity"
-            android:label="@string/title_activity_new_conversation" >
+            android:label="@string/title_activity_new_conversation"
+            android:parentActivityName=".conversationsList.ConversationsListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".conversationsList.ConversationsListActivity" />

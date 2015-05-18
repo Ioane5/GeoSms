@@ -1,16 +1,18 @@
 package utils;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.ioane.sharvadze.geosms.R;
 import com.ioane.sharvadze.geosms.SettingsActivity;
 
 /**
+ * Abstract Class that implements settings.
+ *
  * Created by Ioane on 3/5/2015.
  */
-public abstract class MyActivity extends ActionBarActivity {
+public abstract class MyActivity extends AppCompatActivity {
 
     private static final String TAG = MyActivity.class.getSimpleName();
 

@@ -1,6 +1,5 @@
 package com.ioane.sharvadze.geosms.conversation;
 
-import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.app.NotificationManager;
 import android.content.ClipData;
@@ -16,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -547,11 +547,14 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if(contacts == null || contacts.size() <= 0)
+            return false;
         if(item.getItemId() ==  R.id.action_call){
-            if(contacts == null || contacts.size() <= 0)
-                return false;
             Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", contacts.get(0).getAddress(), null));
             startActivity(intent);
+            return true;
+        }else if(item.getItemId() == R.id.people_in_this_conversation){
+            Utils.buildContactsDialog(ConversationActivity.this,contacts).show();
             return true;
         }else
             return super.onOptionsItemSelected(item);

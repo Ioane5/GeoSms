@@ -63,5 +63,8 @@
     <string name="copy">Copy</string>
     <string name="details">Details</string>
     <string name="info">Info</string>
+    <string name="people">People</string>
+    <string name="title_activity_conversation_peope">ConversationPeopeActivity</string>
+    <string name="people_in_this_conversation">People in this Conversation</string>
 
 </resources>
