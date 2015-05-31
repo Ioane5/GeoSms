@@ -182,10 +182,15 @@ public class ConversationActivity extends MyActivity implements LoaderManager.Lo
                 SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
                 final List<SMS> smsList = new ArrayList<>(checkedItemPositions.size());
 
+                Log.i(TAG,"eeh " + checkedItemPositions.size());
                 for (int i = 0; i < checkedItemPositions.size(); i++){
                     int pos = checkedItemPositions.keyAt(i);
-                    if (checkedItemPositions.get(pos))
-                        smsList.add(new SMS((Cursor)adapter.getItem(pos)));
+                    if (checkedItemPositions.get(pos)){
+                        SMS sms = new SMS((Cursor)adapter.getItem(pos));
+                        smsList.add(sms);
+                    }else{
+                        Log.i(TAG,"WTF");
+                    }
                 }
 
                 if(smsList.isEmpty())

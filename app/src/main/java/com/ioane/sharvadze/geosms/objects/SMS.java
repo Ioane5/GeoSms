@@ -93,7 +93,7 @@ public class SMS {
         this.isRead = cv.getAsInteger(MESSAGE.READ) == 1;
         Integer temp = cv.getAsInteger(MESSAGE.STATUS);
         this.isDelivered = temp != null && temp == MESSAGE.STATUS_COMPLETE;
-        this.serviceCenter = cv.getAsString(MESSAGE.SERVICE_CENTER);
+        this.serviceCenter  = cv.getAsString(MESSAGE.SERVICE_CENTER);
     }
 
     public SMS(Cursor cursor) {
@@ -103,6 +103,7 @@ public class SMS {
             return;
         }
 
+        id = cursor.getInt(cursor.getColumnIndex(MESSAGE.ID));
         text = cursor.getString(cursor.getColumnIndex(MESSAGE.BODY));
         date = new Date(cursor.getLong(cursor.getColumnIndex(MESSAGE.DATE)));
 

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -39,6 +38,8 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
     private int receivedMsgCol;
 
+    private static final int OTHER = 1;
+    private static final int ME = 0;
 
     public ConversationCursorAdapter(Context context, Cursor c, boolean autoRequery ,Contact contact) {
         super(context, c, autoRequery);
@@ -47,7 +48,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
         String ownerPhotoUri = Utils.getOwnersImage(context);
 
 
-        if(ContactsContract.Profile.CONTENT_URI == null){
+        if(ownerPhotoUri == null){
             OWNER_IMAGE = BitmapFactory.decodeResource(context.getResources(),
                     R.mipmap.ic_no_image);
             // make it circle like.
@@ -71,7 +72,14 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.message_item,parent,false);
+        switch (getItemViewType(cursor)){
+            case ME:
+                return LayoutInflater.from(context).inflate(R.layout.message_item_me,parent,false);
+            case OTHER:
+                return LayoutInflater.from(context).inflate(R.layout.message_item_other,parent,false);
+            default:
+                return null;
+        }
     }
 
 
@@ -156,6 +164,24 @@ public class ConversationCursorAdapter extends CursorAdapter {
         CharSequence formattedTime = DateUtils.getRelativeTimeSpanString(message.getDate().getTime(),
                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL);
         holder.timeView.setText(formattedTime);
+    }
 
+
+    @Override
+    public int getItemViewType(int position) {
+        return getItemViewType((Cursor)getItem(position));
+    }
+
+
+    private int getItemViewType(Cursor c) {
+        SMS message = new SMS(c);
+        if(message.getMsgType() == SMS.MsgType.RECEIVED)
+            return OTHER;
+        return ME;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 }

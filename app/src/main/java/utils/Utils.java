@@ -281,6 +281,7 @@ public class Utils {
 
     public static void deleteSmsList(Context context,List<SMS> smsList) {
         for(SMS sms:smsList){
+            Log.i(TAG,"m " + sms.getId());
             context.getContentResolver().delete(Constants.URIS.SMS,"_id=?",
                     new String[]{""+sms.getId()});
         }

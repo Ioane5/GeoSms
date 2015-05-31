@@ -27,11 +27,11 @@
 
 
     <item name="theme_msg_color" type="color">#ff4e4e4e</item>
-    <item name="themePrimary" type="color">#455A64</item>
+    <item name="themePrimary" type="color">#0091EA</item>
     <item name="themeAccent" type="color">#FBC02D</item>
-    <item name="themePrimaryDark" type="color">#37474F</item>
+    <item name="themePrimaryDark" type="color">#1565C0</item>
 
-    <item name="themeLight" type="color">#B0BEC5</item>
+    <item name="themeLight" type="color">#90CAF9</item>
     <item name="themeLight2" type="color">#72ffe57f</item>
 
     <color name="theme_grey">#ffa4a4a4</color>
