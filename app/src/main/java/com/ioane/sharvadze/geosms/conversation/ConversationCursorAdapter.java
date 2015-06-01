@@ -35,8 +35,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
     private Bitmap OWNER_IMAGE;
 
-    private int receivedMsgCol;
-
     private static final int OTHER = 1;
     private static final int ME = 0;
 
@@ -57,7 +55,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
             OWNER_IMAGE = Utils.getCircleBitmap(Utils.getPhotoFromURI(ownerPhotoUri,context,60));
         }
 
-        this.receivedMsgCol = context.getResources().getColor(R.color.themeLight);
     }
 
 
@@ -121,8 +118,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
             holder.photo.setVisibility(View.VISIBLE);
         }
 
-        view.setBackgroundColor(Color.TRANSPARENT);
-
         switch (type){
             case SENT:
                 break;
@@ -139,7 +134,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
                 holder.deliveryStatusView.setTextColor(Color.RED);
                 break;
             case RECEIVED:
-                view.setBackgroundColor(receivedMsgCol);
                 /*
                     If this is sms from sender or is first, let's show header...
                  */

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -39,6 +40,8 @@ public class MyNotificationManager extends BroadcastReceiver{
     private static final String TAG = MyNotificationManager.class.getSimpleName();
 
     public static final int ID_SMS_RECEIVED = 1231321;
+
+    public static final int ID_SMS_FAILED = 1222322;
 
     // TODO THIS SHOULDN'T BE STATIC
     private static HashMap<Pair<String,String>,Integer> receivedMessages =  new HashMap<>();
@@ -154,6 +157,27 @@ public class MyNotificationManager extends BroadcastReceiver{
         }
 
     }
+
+    public static void buildSmsFailed(Context context,String address,NotificationCompat.Builder mBuilder){
+        mBuilder.setContentTitle(context.getString(R.string.sms_sending_faild))
+                .setSmallIcon(R.mipmap.ic_sms_failed)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setAutoCancel(true);
+        Intent resultIntent = new Intent(context, ConversationActivity.class);
+
+        resultIntent.setData(Uri.parse("smsto:"+ address));
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(ConversationsListActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        mBuilder.setContentIntent(resultPendingIntent);
+    }
+
 
     @TargetApi(16)
     private static void setPriority(NotificationCompat.Builder builder){

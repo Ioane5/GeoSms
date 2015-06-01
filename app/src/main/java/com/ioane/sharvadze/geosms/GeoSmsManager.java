@@ -73,10 +73,9 @@ public class GeoSmsManager {
 
                 Intent sentPI = new Intent(Constants.Actions.MESSAGE_SENT, insertedSmsURI ,
                         context.getApplicationContext(), SmsDispatcher.class);
-                sentPI.putExtra(Constants.RECIPIENT_IDS, threadId);
+                sentPI.putExtra(Constants.ADDRESS, address);
+                sentPI.putExtra(Constants.THREAD_ID, threadId);
 
-
-                // TODO why RECIPIENT_IDS
 
                 if(!web){
                     // send normal sms using GSM.

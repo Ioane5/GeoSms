@@ -47,7 +47,6 @@
             android:id="@+id/conversations_list_view"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
-            android:headerDividersEnabled="false"
             android:choiceMode="multipleChoiceModal"
             />
 
@@ -63,7 +62,7 @@
             fab:fab_shadow="true"
             fab:fab_colorNormal="@color/themePrimary"
             fab:fab_colorPressed="@color/themeLight"
-            fab:fab_colorRipple="@color/themeAccent" />
+            fab:fab_colorRipple="@color/themeLightExtra" />
 
 
 

@@ -7,6 +7,7 @@
     android:background="@color/conversations_list"
     android:id="@+id/conversation_activity"
     android:divider="@drawable/divider"
+    android:showDividers="middle"
     >
 
     <QuickContactBadge
@@ -20,14 +21,11 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:id="@+id/conversation_list_view"
-
-        android:listSelector="@drawable/selectible_item_background"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:stackFromBottom="true"
         android:transcriptMode="normal"
         android:choiceMode="multipleChoiceModal"
-
         />
 
 

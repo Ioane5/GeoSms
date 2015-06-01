@@ -7,7 +7,7 @@
     android:id="@+id/message_item"
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
-    android:background="@drawable/selectible_item_background"
+    android:background="@drawable/message_item_me"
     android:baselineAligned="false">
 
     <LinearLayout
@@ -19,7 +19,6 @@
 
         <TextView
             android:layout_gravity="top"
-            android:text="2 mins"
             android:textAllCaps="true"
             android:textSize="8sp"
             android:id="@+id/time_view"
@@ -33,7 +32,6 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:text="ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="9sp"
@@ -49,13 +47,14 @@
         <TextView
             android:layout_gravity="fill|end"
             android:padding="10dp"
-            android:text="rogor  \n martla ipareba texti ?"
             android:textColor="@color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="8sp"
             android:textSize="16sp"
-            android:id="@+id/message_text_view"/>
+            android:id="@+id/message_text_view"
+            android:layout_toLeftOf="@+id/message_contact_photo"
+            android:layout_toStartOf="@+id/message_contact_photo" />
 
         <ImageView
             android:contentDescription="@string/image"

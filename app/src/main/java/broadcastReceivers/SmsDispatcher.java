@@ -68,7 +68,7 @@ public class SmsDispatcher extends BroadcastReceiver {
         if(action.equals(Constants.Actions.SMS_DELIVERED)){
             handleSmsDelivered(context, intent);
 
-        }else if(action.equals( Constants.Actions.MESSAGE_SENT)){
+        }else if(action.equals(Constants.Actions.MESSAGE_SENT)){
             handleSmsSend(context, intent);
 
         }else if(action.contains(Constants.Actions.SMS_RECEIVED_NEW) ||
@@ -155,7 +155,8 @@ public class SmsDispatcher extends BroadcastReceiver {
 
         ContentValues values = new ContentValues();
 
-        long threadId = intent.getLongExtra(Constants.RECIPIENT_IDS,0);
+        String address = intent.getStringExtra(Constants.ADDRESS);
+        long threadId = intent.getLongExtra(Constants.THREAD_ID, 0);
 
         switch (getResultCode()){
             case Activity.RESULT_OK:
@@ -164,6 +165,18 @@ public class SmsDispatcher extends BroadcastReceiver {
                 break;
             default:
                 values.put(Constants.MESSAGE.TYPE,Constants.MESSAGE.MESSAGE_TYPE_FAILED);
+                NotificationManager mNotificationManager =
+                        (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                if(address == null){
+                    Log.e(TAG,"address was null, SMS_FAILED");
+                }
+                if(currentThreadId != threadId){
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx);
+                    MyNotificationManager.buildSmsFailed(ctx, address, builder);
+                    mNotificationManager.notify(MyNotificationManager.ID_SMS_FAILED, builder.build());
+                }
+
                 Log.d(TAG,"Message sending failed result Code :" + getResultCode());
         }
         try{

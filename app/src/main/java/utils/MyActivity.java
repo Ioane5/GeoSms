@@ -19,7 +19,6 @@ public abstract class MyActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.animator.abc_slide_out_left, R.anim.abc_fade_out);
     }
 
 

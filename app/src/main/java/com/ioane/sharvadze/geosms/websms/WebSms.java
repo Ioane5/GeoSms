@@ -1,6 +1,7 @@
 package com.ioane.sharvadze.geosms.websms;
 
 /**
+ * Class WebSms interface
  * Created by Ioane on 3/5/2015.
  */
 public interface WebSms {

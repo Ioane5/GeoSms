@@ -137,7 +137,7 @@ public class Contact implements Serializable{
         if(!TextUtils.isEmpty(photoUri)){
             this.photo = Utils.getCircleBitmap(Utils.getPhotoFromURI(photoUri, ctx, size));
         }else if(!TextUtils.isEmpty(getDisplayName())){
-            this.photo = Utils.createTextBitmap(getDisplayName(),size);
+            this.photo = Utils.createTextBitmap(getDisplayName(),size,ctx);
         }else{
             this.photo = BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_no_image);
         }

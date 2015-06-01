@@ -154,7 +154,7 @@ public class Utils {
         }
         return obj;
     }
-    public static Bitmap createTextBitmap(String txt,int size){
+    public static Bitmap createTextBitmap(String txt,int size,Context context){
         if(txt.length() > 2){
             txt = txt.substring(0,2);
         }
@@ -168,7 +168,7 @@ public class Utils {
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.parseColor("#FBC02D"));
+        paint.setColor(context.getResources().getColor(R.color.themeAccent));
 
         Paint textPaint = new Paint();
         Rect textBounds = new Rect();
