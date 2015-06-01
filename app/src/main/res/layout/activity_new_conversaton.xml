@@ -9,11 +9,10 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:padding="10dp"
         android:textSize="20sp"
         android:text="@string/To"
-        android:textColor="@color/white"
         android:layout_gravity="center"
         android:id="@+id/empty_chosen_contact_view"
         />
@@ -21,7 +20,7 @@
     <GridView
         android:animateLayoutChanges="true"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
 
@@ -39,7 +38,6 @@
 
         android:scrollbarStyle="outsideInset"
         android:id="@+id/gridView"
-        android:background="@color/themeAccent2"
         />
 
     <LinearLayout

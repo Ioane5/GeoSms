@@ -6,6 +6,7 @@
     android:focusableInTouchMode="true"
     android:background="@color/conversations_list"
     android:id="@+id/conversation_activity"
+    android:divider="@drawable/divider"
     >
 
     <QuickContactBadge
@@ -15,7 +16,7 @@
 
     <ListView
         android:scrollbarStyle="insideOverlay"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:id="@+id/conversation_list_view"
@@ -26,6 +27,7 @@
         android:stackFromBottom="true"
         android:transcriptMode="normal"
         android:choiceMode="multipleChoiceModal"
+
         />
 
 
@@ -39,9 +41,7 @@
         <ToggleButton
             android:layout_height="35dp"
             android:layout_width="35dp"
-
             android:layout_gravity="top"
-
             android:textOff=""
             android:textOn=""
             android:background="@drawable/web_toggle_button"
@@ -54,25 +54,25 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <EditText
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
 
-                android:layout_marginTop="7dp"
-                android:paddingRight="5dp"
-                android:paddingLeft="5dp"
-                android:layout_gravity="center"
+            android:layout_marginTop="7dp"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:layout_gravity="center"
 
-                android:scrollbars="vertical"
-                android:inputType="textShortMessage|textMultiLine"
-                android:singleLine="false"
-                android:maxLines="5"
-                android:hint="@string/edit_text_hint"
-                android:textColorHint="@color/theme_grey"
-                android:background="#ffffffff"
-                android:imeOptions="flagNoExtractUi"
-                android:focusableInTouchMode="true"
-                android:id="@+id/enter_message_edit_text"/>
+            android:scrollbars="vertical"
+            android:inputType="textShortMessage|textMultiLine"
+            android:singleLine="false"
+            android:maxLines="5"
+            android:hint="@string/edit_text_hint"
+            android:textColorHint="@color/themePrimary"
+            android:background="#ffffffff"
+            android:imeOptions="flagNoExtractUi"
+            android:focusableInTouchMode="true"
+            android:id="@+id/enter_message_edit_text"/>
 
             <TextView
                 android:layout_gravity="end"
@@ -84,8 +84,6 @@
 
         <ImageButton
             android:layout_gravity="top"
-
-
             android:layout_width="35dp"
             android:layout_height="35dp"
 
@@ -97,6 +95,7 @@
             android:scaleType="fitCenter"
             android:clickable="true"
             android:background="@drawable/send_button"
+            android:src="@mipmap/ic_send"
             android:id="@+id/send_button"
             android:contentDescription="@string/send_button" />
     </LinearLayout>

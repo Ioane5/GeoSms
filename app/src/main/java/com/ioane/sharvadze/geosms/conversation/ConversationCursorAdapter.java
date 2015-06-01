@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +63,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
     private class ViewHolder {
         TextView messageView;
-        TextView nameView;
+        //TextView nameView;
         TextView deliveryStatusView;
         TextView timeView;
         ImageView photo;
@@ -91,7 +90,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
         if (holder == null) {
             holder = new ViewHolder();
-            holder.nameView = (TextView)view.findViewById(R.id.name_view);
+            //holder.nameView = (TextView)view.findViewById(R.id.name_view);
             holder.messageView = (TextView)view.findViewById(R.id.message_text_view);
             holder.deliveryStatusView = (TextView)view.findViewById(R.id.delivery_status_view);
             holder.timeView = (TextView)view.findViewById(R.id.time_view);
@@ -108,7 +107,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
             nextSms = new SMS(cursor);
         }
 
-        holder.nameView.setText(null);
         holder.photo.setVisibility(View.INVISIBLE);
 
         if (holder.deliveryStatusView.length() > 0) {
@@ -119,7 +117,6 @@ public class ConversationCursorAdapter extends CursorAdapter {
             let's show header. like photo and name...
          */
         if(type != SMS.MsgType.RECEIVED && (nextSms == null || nextSms.getMsgType() == SMS.MsgType.RECEIVED)){
-            holder.nameView.setText(R.string.me);
             holder.photo.setImageBitmap(OWNER_IMAGE);
             holder.photo.setVisibility(View.VISIBLE);
         }
@@ -147,10 +144,8 @@ public class ConversationCursorAdapter extends CursorAdapter {
                     If this is sms from sender or is first, let's show header...
                  */
                 if(nextSms == null || nextSms.getMsgType() != SMS.MsgType.RECEIVED){
-                    holder.nameView.setText(TextUtils.isEmpty(contact.getName())? contact.getAddress():contact.getName());
                     holder.photo.setImageBitmap(contact.getPhoto());
                     holder.photo.setVisibility(View.VISIBLE);
-
                     break;
                 }
         }
@@ -174,6 +169,7 @@ public class ConversationCursorAdapter extends CursorAdapter {
 
 
     private int getItemViewType(Cursor c) {
+        if(c == null) return ME;
         SMS message = new SMS(c);
         if(message.getMsgType() == SMS.MsgType.RECEIVED)
             return OTHER;
